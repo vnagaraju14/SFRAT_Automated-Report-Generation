@@ -1,10 +1,11 @@
 #Preliminary
-dataset <- NA #path to the dataset
+dataset <- read_excel("~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/model_testing/model_data.xlsx",sheet = 2)  #path to the dataset
 
 # TAB 1
 confidence_lvl <- .9 #float
 
 # TAB 2
+num_failures_future_prediction <- 1
 models_to_apply <- c('DSS', 'GM', 'Wei','GO','JM') #vector
 mission_time <- 600
   

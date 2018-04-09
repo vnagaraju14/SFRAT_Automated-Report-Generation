@@ -29,7 +29,7 @@ source('report-specifications.R')
 source('~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/utility/data/Data_Tools.R')
 
 #Input excel file with a single sheet for now
-d <- read_excel("~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/model_testing/SYS1_data.xlsx") # TODO: This
+d <- dataset
 cnames <- colnames(d) # Read column names in the input excel file
 
 #Data conversion depending on the type of the input data
@@ -69,30 +69,18 @@ if("FN" %in% cnames && "IF" %in% cnames && "FT" %in% cnames) {
   print("Unable to load in data.")
 })
 d <- data.frame("FN"=FN,"IF"=IF,"FT"=FT)
-
-
-#FT
-#IF
-#FN
-#FC
-#CFC
 ```
 
-# Tab 1: Select, Apply, and Analyze Data
-Sample of the uploaded input data is shown below: 
+#Tab 1: Select, Apply, and Analyze Data
+##Sample of the updated data different formats:
 ```{r, echo=FALSE}
 if("T" %in% cnames && "FC" %in% cnames && "CFC" %in% cnames) {
-print("Failure counts data")
-data_gen.FR <- data.frame("FT"=FT,"IF"=IF,"FN"=FN)
-data_gen.FC <- data.frame("FC"=FC, "CFC"=CFC)
-data_gen <- list(data_gen.FR,data_gen.FC)
-head(data_gen,10)
+list(data.frame("FT"=head(FT),"IF"=head(IF),"FN"=head(FN)),data.frame("FC"=head(FC), "CFC"=head(CFC)))
 }else{
   kable(d[1:10,], caption="First ten points of the input data")
 }
 ```
 
-## Cumulative failures
 ```{r, echo=FALSE}
 plot(
   FT, FN, type="s",
@@ -101,7 +89,6 @@ plot(
 )
 ```
 
-## Times between failures
 ```{r, echo=FALSE}
 plot(
   FT, IF, type="s",
@@ -110,7 +97,6 @@ plot(
 )
 ```
 
-## Failure intensity
 ```{r, echo=FALSE}
 plot(
   FT, 1/IF, type="s",
@@ -119,6 +105,7 @@ plot(
 )
 ```
 
+##The Laplace test is the default trend test, which possesses a statistical interpretation and allows the user to specify a confidence level between 0 and 1 to quantify a desired level of significance that the data exhibits (or does not exhibit) reliability growth. Decreasing trend indicates reliability growth and the red line indicates the user specified significance level.
 ```{r, echo=FALSE}
 laplace_trend_test <- function(inter_failure) {
   n <- length(inter_failure)
@@ -171,7 +158,7 @@ localTrendPlot <-
 localTrendPlot
 ```
 
-## Running arithmetic average
+##The running arithmetic average, computes and plots a running average of the times between failures. A plot exhibiting a positive slope indicates that the times between failures are increasing, suggesting reliability growth during testing.
 ```{r,echo=FALSE}
 running_average_test <- function(inter_failure) {
   n <- length(inter_failure)
@@ -195,7 +182,8 @@ plot(
 )
 ```
 
-# Tab2: Set Up and Apply Models
+
+#Tab2: Set Up and Apply Models
 ```{r, echo=FALSE}
 #Add in models to be used
 source('~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/models/DSS/DSS_BM_FT.R')
@@ -210,7 +198,6 @@ source('~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/models/Wei/Wei_NM_FT.R
 source('~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/models/Wei/Model_specifications.R')
 ```
 
-## Cumulative failures - JM, GM, GO, DSS, and Weibull
 ```{r, echo=FALSE}
 models <- c() #used for legend
 modelList <- list() #passed to plot
@@ -279,8 +266,6 @@ title("Cumualtive failures vs. cumualtive test time")
 legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
-
-## Times between failures or MTTF
 ```{r,echo=FALSE}
 modelList <- list() #passed to plot
 modelIterator <- 1; #used for creating a list
@@ -345,7 +330,6 @@ title("Times between failures vs. cumualtive test time")
 legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
-## Failure Intensity
 ```{r, echo=FALSE}
 modelList <- list() #passed to plot
 modelIterator <- 1;
@@ -410,7 +394,6 @@ title("Cumualtive test time vs. Failure intensity")
 legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
-## Reliability Growth
 ```{r,echo=FALSE}
 #Mission time delta value; comes from report-specifications.R
 modelList <- list() #passed to plot
@@ -478,72 +461,154 @@ title("Reliability growth vs. cumualtive test time")
 legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
-# Tab3: Query Model Results
+
+#Tab3: Query Model Results
 ```{r,echo=FALSE}
 source('~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/utility/prediction/Detailed_prediction.R')
 
 #Setting Up The Table
-predTable <- matrix(NA, nrow = 5, ncol = 3)
-rownames(predTable) <- c("DSS","GO","JM","GM","Wei")
+predTable <- matrix(NA, nrow = length(models) , ncol = 3)
+rownames(predTable) <- models
 colnames(predTable) <- c("Time to achieve specified reliability","Expected number of failures","Expected time to N failure")
 
 ##Calulating Future Failures
 #Time to achieve specified reliability
-predTable[,1] <- c(
-  get_reliability_t("DSS",DSS_BM_MLE(FT),desired_reliability,reliability_interval_length,last(FT),num_failures_to_predict),
-  get_reliability_t("GO",GO_BM_MLE(FT),desired_reliability,reliability_interval_length,last(FT),num_failures_to_predict),
-  get_reliability_t("JM",JM_BM_MLE(IF),desired_reliability,reliability_interval_length,last(IF),num_failures_to_predict),
-  get_reliability_t("GM",GM_BM_MLE(IF),desired_reliability,reliability_interval_length,last(IF),num_failures_to_predict),
-  get_reliability_t("Wei",Wei_NM_MLE(FT),desired_reliability,reliability_interval_length,last(FT),num_failures_to_predict)
-)
-#Expected number of failures
-predTable[,2] <- c(
-  get_prediction_k("DSS",DSS_BM_MLE(FT),additional_time_software_will_run,last(FT),length(FT)),
-  get_prediction_k("GO",GO_BM_MLE(FT),10,last(FT),length(FT)),
-  get_prediction_k("JM",JM_BM_MLE(IF),10,last(FT),length(FT)),
-  get_prediction_k("GM",GM_BM_MLE(IF),10,last(FT),length(FT)),
-  get_prediction_k("Wei",Wei_NM_MLE(FT),10,last(FT),length(FT))
-)
-#Expected time to N failure
-predTable[,3] <- c(
-  get_prediction_t("DSS",DSS_BM_MLE(FT),1,last(FT),length(FT)),
-  get_prediction_t("GO",GO_BM_MLE(FT),1,last(FT),length(FT)),
-  get_prediction_t("JM",JM_BM_MLE(IF),1,last(FT),length(FT)),
-  get_prediction_t("GM",GM_BM_MLE(IF),1,last(FT),length(FT)),
-  get_prediction_t("Wei",Wei_NM_MLE(FT),1,last(FT),length(FT))
-)
 
-#As of right now, the table can only hold a single value
+firstCol <- c() #First column of prediction table
+
+if('DSS' %in% models) { 
+  firstCol=append(firstCol,get_reliability_t("DSS",DSS_BM_MLE(FT),desired_reliability,reliability_interval_length,last(FT),num_failures_to_predict))
+}
+
+if('GO' %in% models) {
+  firstCol=append(firstCol,get_reliability_t("GO",GO_BM_MLE(FT),desired_reliability,reliability_interval_length,last(FT),num_failures_to_predict))
+}
+
+if('JM' %in% models) { 
+  firstCol=append(firstCol,get_reliability_t("JM",JM_BM_MLE(IF),desired_reliability,reliability_interval_length,last(IF),num_failures_to_predict))
+}
+
+if('GM' %in% models) {
+  firstCol=append(firstCol,get_reliability_t("GM",GM_BM_MLE(IF),desired_reliability,reliability_interval_length,last(FT),num_failures_to_predict))##The right hand side is creating a null model. TODO: Refer back to the original file to solve this precision issue
+}
+
+if('Wei' %in% models) { 
+  firstCol=append(firstCol,get_reliability_t("Wei",Wei_NM_MLE(FT),desired_reliability,reliability_interval_length,last(FT),num_failures_to_predict))
+}
+
+predTable[,1] <- firstCol
+
+#Expected number of failures
+secondCol <- c()
+if('DSS' %in% models) { ##t_offset=10?? why??
+  secondCol=append(secondCol, get_prediction_k("DSS",DSS_BM_MLE(FT),additional_time_software_will_run,last(FT),length(FT)))
+}
+
+if('GO' %in% models) {
+  secondCol=append(secondCol,get_prediction_k("GO",GO_BM_MLE(FT),10,last(FT),length(FT)))
+}
+
+if('JM' %in% models) { 
+  secondCol=append(secondCol,get_prediction_k("JM",JM_BM_MLE(IF),10,last(FT),length(FT)))
+}
+
+if('GM' %in% models) {
+  secondCol=append(secondCol,get_prediction_k("GM",GM_BM_MLE(IF),10,last(FT),length(FT)))
+}
+
+if('Wei' %in% models) { 
+  secondCol=append(secondCol, get_prediction_k("Wei",Wei_NM_MLE(FT),10,last(FT),length(FT)))
+}
+
+predTable[,2] <- secondCol
+
+
+#Expected time to N failure
+thirdCol <- c()
+if('DSS' %in% models) { 
+  thirdCol=append(thirdCol,get_prediction_t("DSS",DSS_BM_MLE(FT),num_failures_future_prediction,last(FT),length(FT)))
+}
+
+if('GO' %in% models) {
+  thirdCol=append(thirdCol,get_prediction_t("GO",GO_BM_MLE(FT),num_failures_future_prediction,last(FT),length(FT)))
+}
+
+if('JM' %in% models) { 
+  thirdCol=append(thirdCol,get_prediction_t("JM",JM_BM_MLE(IF),num_failures_future_prediction,last(FT),length(FT)))
+}
+
+if('GM' %in% models) {
+  thirdCol=append(thirdCol,get_prediction_t("GM",GM_BM_MLE(IF),num_failures_future_prediction,last(FT),length(FT)))
+}
+
+if('Wei' %in% models) { 
+  thirdCol=append(thirdCol,get_prediction_t("Wei",Wei_NM_MLE(FT),num_failures_future_prediction,last(FT),length(FT)))
+}
+
+
+predTable[,3] <- thirdCol
+
+#As of now, the table can only hold a single value
 #TODO:multiple rows for each falure prediction
 
 kable(predTable)
 ```
 
+
 # Tab4: Evaluate Models
+##Smaller values of AIC and PSSE values are preferred.
 ```{r,echo=FALSE}
 source('~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/utility/metrics/GOF.R')
 #Setup Table
-GOFTable <- matrix(NA, nrow = 5, ncol = 2)
-rownames(GOFTable) <- c("DSS", "GO", "JM", "GM", "Wei")
+GOFTable <- matrix(NA, nrow = length(models), ncol = 2)
+rownames(GOFTable) <- models
 colnames(GOFTable) <- c("AIC", "PSSE")
 
 #Calculate AIC
-GOFTable[,1] <- c(
-  aic(2, DSS_lnL(FT, DSS_BM_MLE(FT))),
-  aic(2, GO_lnL(FT, GO_BM_MLE(FT))),
-  aic(2, JM_lnL(IF, JM_BM_MLE(IF))),
-  aic(2, GM_lnL(IF, GM_BM_MLE(IF))),
-  aic(3, Wei_lnL(FT, Wei_NM_MLE(FT)))
-)
+GOFFirstCol <- c()
+if('DSS' %in% models) { 
+  GOFFirstCol=append(GOFFirstCol,aic(2, DSS_lnL(FT, DSS_BM_MLE(FT))))
+}
+
+if('GO' %in% models) {
+  GOFFirstCol=append(GOFFirstCol,aic(2, GO_lnL(FT, GO_BM_MLE(FT))))
+}
+
+if('JM' %in% models) { 
+  GOFFirstCol=append(GOFFirstCol,aic(2, JM_lnL(IF, JM_BM_MLE(IF))))
+}
+
+if('GM' %in% models) {
+  GOFFirstCol=append(GOFFirstCol,aic(2, GM_lnL(IF, GM_BM_MLE(IF))))
+}
+
+if('Wei' %in% models) { 
+  GOFFirstCol=append(GOFFirstCol,aic(3, Wei_lnL(FT, Wei_NM_MLE(FT))))
+}
+GOFTable[,1] <-GOFFirstCol
 
 #Calculate PSSE
-GOFTable[,2] <- c(
-  psse("DSS", FT, DSS_BM_MLE(FT), percent_data_for_PSEE),
-  psse("GO", FT, GO_BM_MLE(FT), percent_data_for_PSEE),
-  psse("JM", FT, JM_BM_MLE(IF), percent_data_for_PSEE),
-  psse("GM", FT, GM_BM_MLE(IF), percent_data_for_PSEE),
-  psse("Wei", FT, Wei_NM_MLE(FT), percent_data_for_PSEE)
-)
+GOFSecondCol <- c()
+if('DSS' %in% models) { 
+  GOFSecondCol=append(GOFSecondCol,psse("DSS", FT, DSS_BM_MLE(FT), percent_data_for_PSEE))
+}
+
+if('GO' %in% models) {
+  GOFSecondCol=append(GOFSecondCol,psse("GO", FT, GO_BM_MLE(FT), percent_data_for_PSEE))
+}
+
+if('JM' %in% models) { 
+  GOFSecondCol=append(GOFSecondCol, psse("JM", FT, JM_BM_MLE(IF), percent_data_for_PSEE))
+}
+
+if('GM' %in% models) {
+  GOFSecondCol=append(GOFSecondCol,psse("GM", FT, GM_BM_MLE(IF), percent_data_for_PSEE))
+}
+
+if('Wei' %in% models) { 
+  GOFSecondCol=append(GOFSecondCol, psse("Wei", FT, Wei_NM_MLE(FT), percent_data_for_PSEE))
+}
+GOFTable[,2] <-GOFSecondCol
 
 kable(GOFTable)
 ```
