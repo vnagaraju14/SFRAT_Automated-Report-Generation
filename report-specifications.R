@@ -1,6 +1,8 @@
 #Preliminary
-dataset <- read_excel("~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/model_testing/model_data.xlsx",sheet = 2)  #path to the dataset
-
+datapath <- "C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/model_testing/NASA_SFRAT_Case_Study.xlsx"#path to the dataset
+dataset <- read_excel(datapath,sheet = 1)  #Specify the sheet with the data
+SheetName<-excel_sheets(path=datapath)[1] #Specify the sheet selected in the above line
+colors <- c("navy","red","green","firebrick4","magenta")
 # TAB 1
 confidence_lvl <- .9 #float
 
@@ -16,4 +18,4 @@ desired_reliability <- .9 #float
 reliability_interval_length<- 600 #float
 
 # TAB 4
-percent_data_for_PSEE <- .9
+percent_data_for_PSSE <- .9
