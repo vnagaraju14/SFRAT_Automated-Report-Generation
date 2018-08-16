@@ -30,7 +30,11 @@ source('report-specifications.R')
 
 ```{r, echo=FALSE}
 ##DATA PREPROCESSING
+<<<<<<< HEAD
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/utility/data/Data_Tools.R')
+=======
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/utility/data/Data_Tools.R')
+>>>>>>> origin/master
 
 #Input excel file with a single sheet for now
 d <- dataset
@@ -212,6 +216,7 @@ plot(
 #Tab2: Set Up and Apply Models
 ```{r, echo=FALSE}
 #Add in models to be used
+<<<<<<< HEAD
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/DSS/DSS_BM_FT.R')
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/DSS/Model_specifications.R')
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/GO/GO_BM_FT.R')
@@ -222,6 +227,18 @@ source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SF
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/GM/Model_specifications.R')
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/Wei/Wei_NM_FT.R')
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/Wei/Model_specifications.R')
+=======
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/DSS/DSS_BM_FT.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/DSS/Model_specifications.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/GO/GO_BM_FT.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/GO/Model_specifications.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/JM/JM_BM.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/JM/Model_specifications.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/GM/GM_BM.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/GM/Model_specifications.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/Wei/Wei_NM_FT.R')
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/models/Wei/Model_specifications.R')
+>>>>>>> origin/master
 ```
 
 ##Cumulative failures
@@ -298,6 +315,10 @@ Models `r models` successfully characterized the input data. The staircase plot 
 
 ##Times between failures
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 
 ```{r,echo=FALSE}
 modelList <- list() #passed to plot
@@ -358,6 +379,10 @@ title(bquote("Times between failures vs. cumualtive test time" ~.(SheetName)))
 legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 ##Failure intensity
 
 ```{r, echo=FALSE}
@@ -420,7 +445,11 @@ for (i in 1:ntrees) {
 }
 
 title(bquote("Failure intensity vs. Cumualtive test time" ~.(SheetName)))
+<<<<<<< HEAD
 legend("topright", legend=models, lty=c(1,1), cex=0.8, col=colors)
+=======
+legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
+>>>>>>> origin/master
 ```
 
 ##Reliability growth
@@ -498,7 +527,11 @@ How long will it take to observe a given number of failures?
 How much more testing time will be needed to obtain a given reliability for a specified operating time?
 
 ```{r,echo=FALSE}
+<<<<<<< HEAD
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/utility/prediction/Detailed_prediction.R')
+=======
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/utility/prediction/Detailed_prediction.R')
+>>>>>>> origin/master
 
 #Setting Up The Table
 predTable <- matrix(NA, nrow = length(models) , ncol = 3)
@@ -585,7 +618,11 @@ predTable[,3] <- thirdCol
 #As of now, the table can only hold a single value
 #TODO:multiple rows for each falure prediction
 
+<<<<<<< HEAD
 kable(predTable,align='r',digits=2)
+=======
+kable(predTable,align='r')
+>>>>>>> origin/master
 ```
 
 \newpage
@@ -595,7 +632,11 @@ After applying one or more models to a set of failure data, the user can assess 
 
 ```{r,echo=FALSE}
 
+<<<<<<< HEAD
 source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/utility/metrics/GOF.R')
+=======
+source('C:/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master/SFRAT_Automated-Report-Generation-master/SFRAT/utility/metrics/GOF.R')
+>>>>>>> origin/master
 #Setup Table
 GOFTable <- matrix(NA, nrow = length(models), ncol = 2)
 rownames(GOFTable) <- models
@@ -640,6 +681,7 @@ GOFTable[,1] <- fircol
 GOFSecondCol <- c()
 if('DSS' %in% models) { 
   GOFSecondCol=append(GOFSecondCol,psse("DSS", FT, DSS_BM_MLE(FT), percent_data_for_PSSE))
+<<<<<<< HEAD
 }
 
 if('GO' %in% models) {
@@ -774,4 +816,40 @@ predTable[,3] <- thirdCol
 #TODO:multiple rows for each falure prediction
 
 kable(predTable,align='r',digits=2)
+=======
+}
+
+if('GO' %in% models) {
+  GOFSecondCol=append(GOFSecondCol,psse("GO", FT, GO_BM_MLE(FT), percent_data_for_PSSE))
+}
+
+if('JM' %in% models) { 
+  GOFSecondCol=append(GOFSecondCol, psse("JM", FT, JM_BM_MLE(IF), percent_data_for_PSSE))
+}
+
+if('GM' %in% models) {
+  GOFSecondCol=append(GOFSecondCol,psse("GM", FT, GM_BM_MLE(IF), percent_data_for_PSSE))
+}
+
+if('Wei' %in% models) { 
+  GOFSecondCol=append(GOFSecondCol, psse("Wei", FT, Wei_NM_MLE(FT), percent_data_for_PSSE))
+}
+
+GOFSecondCol <-  round(GOFSecondCol,digits=2)
+seccol <- c()
+for(i in 1:length(models)){
+  if(GOFSecondCol[i]==min(GOFSecondCol)){
+    seccol <- append(seccol,paste(c("*",GOFSecondCol[i]),collapse=""))
+  }else{
+    seccol <- append(seccol,GOFSecondCol[i])
+  }
+  i=i+1;
+}
+
+GOFTable[,2] <- seccol
+
+kable(GOFTable,align='r')
+
+>>>>>>> origin/master
 ```
+##Smaller values of AIC and PSSE values are preferred.
