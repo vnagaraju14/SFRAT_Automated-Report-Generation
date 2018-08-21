@@ -26,7 +26,7 @@ source('report-specifications.R')
 
 ```{r, echo=FALSE}
 ##DATA PREPROCESSING
-source('~/Dropbox/NASA OSMA SARP/Script/srt-3.core-master/utility/data/Data_Tools.R')
+source('./SFRAT/utility/data/Data_Tools.R')
 
 #Input excel file with a single sheet for now
 d <- dataset

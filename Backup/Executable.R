@@ -1,7 +1,6 @@
 library(knitr)
 library(markdown)
 library(rmarkdown)
-source("report-specifications.R")
 
 x <- menu(c("Type '1' for Yes", "Type '0' for No"), title="Display verbose report?")
 
@@ -14,5 +13,4 @@ if (x==1) {
                     output_file =  paste("SFRAT report_NoText_", SheetName,'_', Sys.Date(), ".pdf", sep=''), 
                     output_dir = './Reports')
 }
-
 
