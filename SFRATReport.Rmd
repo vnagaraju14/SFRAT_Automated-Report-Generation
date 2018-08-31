@@ -1,6 +1,9 @@
 ---
-title: "Software Failure and Reliability Assessment Tool: Report"
-output: pdf_document
+title: 'Software Failure and Reliability Assessment Tool: Report'
+author: "xxx"
+date: '`r format(Sys.time(), "%Y-%m-%d_%H:%M")`'
+output:
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -11,11 +14,12 @@ knitr::opts_chunk$set(echo = TRUE)
 #Libraries Needed to genereate report
 library(shiny)
 library(DT)
-library(knitr)
 library(gdata)
 library(ggplot2)
 library(rootSolve)
 library(readxl)
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE)
 ```
 
 ```{r, include=FALSE}
@@ -72,7 +76,11 @@ d <- data.frame("FN"=FN,"IF"=IF,"FT"=FT)
 ```
 
 #Tab 1: Select, Apply, and Analyze Data
-##Sample of the updated data different formats:
+
+##Sample of the updated data ('`r SheetName`') in different formats:
+The table below shows the first ten points of the input data '`r SheetName`'. `FC', `CFC', `FT', `IF', and `FN' indicates failure counts, cumulative failure counts, failure times, interfailure times, and number of failures respectively. 
+
+
 ```{r, echo=FALSE}
 if("T" %in% cnames && "FC" %in% cnames && "CFC" %in% cnames) {
 list(data.frame("FT"=head(FT),"IF"=head(IF),"FN"=head(FN)),data.frame("FC"=head(FC), "CFC"=head(CFC)))
@@ -81,31 +89,48 @@ list(data.frame("FT"=head(FT),"IF"=head(IF),"FN"=head(FN)),data.frame("FC"=head(
 }
 ```
 
+\newpage
+##Cumulative failures
+Figure below shows the cumulative number of failures as a function a cumulative test time for '`r SheetName`'. Increasing trend indicates detection of more failures. Ideally, the cumulative failure should converge to a constant value as testing progresses indicating zero number of failures in the software.
+
 ```{r, echo=FALSE}
 plot(
   FT, FN, type="s",
   xlab="Cumulative test time", ylab="Cumulative number of failures",
-  main = "Cumuative Failures vs. cumulative test time"
+  main =  bquote("Cumuative Failures vs. cumulative test time:" ~.(SheetName))
 )
 ```
+
+\newpage
+##Times between failures/Interfailure times
+Ideally, times between failures should increase over time.
 
 ```{r, echo=FALSE}
 plot(
   FT, IF, type="s",
   xlab="Cumulative test time", ylab="Times between successive failures",
-  main = "Interfailure times vs. cumulative test time"
+  main = bquote("Interfailure times vs. cumulative test time:" ~.(SheetName))
 )
 ```
+
+\newpage
+##Failure intensity
+Decrease in failure intensity indicates increase in reliability of the software subjected to testing. Ideally, failure intensity should go to zero.
 
 ```{r, echo=FALSE}
 plot(
   FT, 1/IF, type="s",
   xlab="Cumulative test time",ylab="Number of failures per unit time",
-  main = "Empirical failure intensity vs. cumulative test time"
+  main = bquote("Empirical failure intensity vs. cumulative test time:" ~.(SheetName))
 )
 ```
 
-##The Laplace test is the default trend test, which possesses a statistical interpretation and allows the user to specify a confidence level between 0 and 1 to quantify a desired level of significance that the data exhibits (or does not exhibit) reliability growth. Decreasing trend indicates reliability growth and the red line indicates the user specified significance level.
+\newpage
+##Laplace Trend Test
+The red horizontal line in the figure indicates the specified confidence level of `r percent_data_for_PSSE*100`%. Additional default levels in black include 90, 95, 99, 99.9, 99.9999, and 99.999999. Values below these lines indicates that the data exhibits reliability growth with the specified level of statistical significance and it is therefore suitable to apply software reliabity models. 
+
+If the Laplace test statistic increases above the horizontal red line, this indicates that the data does not exhibit reliability growth. Thus, it is unlikely that a model can be applied successfully because the results may be inaccurate.
+
 ```{r, echo=FALSE}
 laplace_trend_test <- function(inter_failure) {
   n <- length(inter_failure)
@@ -145,7 +170,7 @@ localTrendPlot <-
   xlab("Failure Number") +
   scale_x_continuous(breaks = round(seq(0 , max(LTT$Index), by = 20), 1)) +
   ylab("Laplace Test Statistic") +
-  ggtitle("Laplace Trend Test") + 
+  ggtitle(bquote("Laplace Trend Test" ~.(SheetName))) + 
   labs(subtitle = bquote("Confidence =" ~.(Confidence.lvl))) +
   geom_hline(yintercept = Significance, color="Red") +
   geom_hline(yintercept = Z.value.1, color="black", linetype = "dotdash", alpha=0.8) +
@@ -158,7 +183,11 @@ localTrendPlot <-
 localTrendPlot
 ```
 
-##The running arithmetic average, computes and plots a running average of the times between failures. A plot exhibiting a positive slope indicates that the times between failures are increasing, suggesting reliability growth during testing.
+\newpage
+##Running arithmetic average
+The running arithmetic average, computes and plots a running average of the times between failures. Intuitively, if the time between failures increases then the running arithmetic average increases, indicating system reliability is improving. A decreasing running arithmetic average indicates reliability deterioration.
+
+
 ```{r,echo=FALSE}
 running_average_test <- function(inter_failure) {
   n <- length(inter_failure)
@@ -178,31 +207,35 @@ running_average_test <- function(inter_failure) {
 plot(
   running_average_test(IF), type="s",
   xlab="Failure number", ylab="Running average of interfailure times",
-  main="Running arithmetic average test"
+  main=bquote("Running arithmetic average test:"~.(SheetName))
 )
 ```
 
-
+\newpage
 #Tab2: Set Up and Apply Models
+
 ```{r, echo=FALSE}
 #Add in models to be used
-source(paste0(getwd(),'/SFRAT/models/DSS/DSS_BM_FT.R'))
-source(paste0(getwd(),'/SFRAT/models/DSS/Model_specifications.R'))
-source(paste0(getwd(),'/SFRAT/models/GO/GO_BM_FT.R'))
-source(paste0(getwd(),'/SFRAT/models/GO/Model_specifications.R'))
-source(paste0(getwd(),'/SFRAT/models/JM/JM_BM.R'))
-source(paste0(getwd(),'/SFRAT/models/JM/Model_specifications.R'))
-source(paste0(getwd(),'/SFRAT/models/GM/GM_BM.R'))
-source(paste0(getwd(),'/SFRAT/models/GM/Model_specifications.R'))
-source(paste0(getwd(),'/SFRAT/models/Wei/Wei_NM_FT.R'))
-source(paste0(getwd(),'/SFRAT/models/Wei/Model_specifications.R'))
+source('./SFRAT/models/DSS/DSS_BM_FT.R')
+source('./SFRAT/models/DSS/Model_specifications.R')
+source('./SFRAT/models/GO/GO_BM_FT.R')
+source('./SFRAT/models/GO/Model_specifications.R')
+source('./SFRAT/models/JM/JM_BM.R')
+source('./SFRAT/models/JM/Model_specifications.R')
+source('./SFRAT/models/GM/GM_BM.R')
+source('./SFRAT/models/GM/Model_specifications.R')
+source('./SFRAT/models/Wei/Wei_NM_FT.R')
+source('./SFRAT/models/Wei/Model_specifications.R')
 ```
+
+##Cumulative failures
+The figure show model result plots for the input data '`r SheetName`'. Models `r models_to_apply` are applied. 
 
 ```{r, echo=FALSE}
 models <- c() #used for legend
 modelList <- list() #passed to plot
 modelIterator <- 1;
-colors <- c() #for plot line colors
+#colors <- c("navy","red","green","firebrick4","magenta") #for plot line colors
 #TODO Fix title
 
 #Apply appropriate models comes from report-specifications.R
@@ -211,7 +244,7 @@ colors <- c() #for plot line colors
     DSS <-  DSS_MVF(DSS_BM_MLE(FT),d)[,2]
     modelList[[modelIterator]] = DSS
     models <- append(models, "DSS")
-    colors <- append(colors, DSS_plotcolor)
+    #colors <- append(colors, DSS_plotcolor)
     modelIterator <- modelIterator + 1
   }
 
@@ -220,7 +253,7 @@ colors <- c() #for plot line colors
     GO <- GO_MVF(GO_BM_MLE(FT),d)[,1]
     modelList[[modelIterator]] = GO
     models <- append(models, "GO")
-    colors <- append(colors, GO_plotcolor)
+   # colors <- append(colors, GO_plotcolor)
     modelIterator <- modelIterator + 1
   }
 
@@ -229,7 +262,7 @@ colors <- c() #for plot line colors
     JM <- JM_MVF(JM_BM_MLE(IF),d)[,1]
     modelList[[modelIterator]] = JM
     models <- append(models, "JM")
-    colors <- append(colors, JM_plotcolor)
+    #colors <- append(colors, JM_plotcolor)
     modelIterator <- modelIterator + 1
   }
 
@@ -238,7 +271,7 @@ colors <- c() #for plot line colors
     GM <- GM_MVF(GM_BM_MLE(IF),d)[,2]
     modelList[[modelIterator]] = GM
     models <- append(models, "GM")
-    colors <- append(colors, GM_plotcolor)
+   # colors <- append(colors, GM_plotcolor)
     modelIterator <- modelIterator + 1
   }
 
@@ -247,7 +280,7 @@ colors <- c() #for plot line colors
     Wei <- Wei_MVF(Wei_NM_MLE(FT),d)[,2]
     modelList[[modelIterator]] = Wei
     models <- append(models, "Wei") 
-    colors <- append(colors, Wei_plotcolor)
+    #colors <- append(colors, Wei_plotcolor)
     modelIterator <- modelIterator + 1
   }
 
@@ -262,21 +295,23 @@ for (i in 1:ntrees) {
   lines(FT, hxy[,i], type="l", col=colors[i])
 }
 
-title("Cumualtive failures vs. cumualtive test time")
+title(bquote("Cumualtive failures vs. cumualtive test time:" ~.(SheetName)))
 legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
+
+\newpage
+##Times between failures
 
 ```{r,echo=FALSE}
 modelList <- list() #passed to plot
 modelIterator <- 1; #used for creating a list
-colors <- c() #for plot line colors
+#colors <- c("navy","red","green","firebrick4","magenta")
 
 #Apply appropriate models comes from report-specifications.R
 DSS = c()
 if('DSS' %in% models) { 
   DSS <- DSS_MTTF(DSS_BM_MLE(FT),d)[,2]
   modelList[[modelIterator]] = DSS
-  colors <- append(colors, DSS_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -284,7 +319,6 @@ GO = c()
 if('GO' %in% models) {
   GO <- GO_MTTF(GO_BM_MLE(FT),d)[,2]
   modelList[[modelIterator]] = GO
-  colors <- append(colors, GO_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -292,7 +326,6 @@ JM = c()
 if('JM' %in% models) { 
   JM <- JM_MTTF(JM_BM_MLE(IF),d)[,2]
   modelList[[modelIterator]] = JM
-  colors <- append(colors, JM_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -300,7 +333,6 @@ GM = c()
 if('GM' %in% models) { 
   GM <- GM_MTTF(GM_BM_MLE(IF),d)[,2]
   modelList[[modelIterator]] = GM
-  colors <- append(colors, GM_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -308,7 +340,6 @@ Wei = c()
 if('Wei' %in% models) { 
   Wei <- Wei_MTTF(Wei_NM_MLE(FT),d)[,2]
   modelList[[modelIterator]] = Wei
-  colors <- append(colors, Wei_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -326,21 +357,23 @@ for (i in 1:ntrees) {
   lines(FT, hxy[,i], type="l", col=colors[i])
 }
 
-title("Times between failures vs. cumualtive test time")
+title(bquote("Times between failures vs. cumualtive test time" ~.(SheetName)))
 legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
+
+\newpage
+##Failure intensity
 
 ```{r, echo=FALSE}
 modelList <- list() #passed to plot
 modelIterator <- 1;
-colors <- c() #for plot line colors
+
 
 #Apply appropriate models comes from report-specifications.R
 DSS = c()
 if('DSS' %in% models) { 
   DSS <- DSS_FI(DSS_BM_MLE(FT),d)[,2];
   modelList[[modelIterator]] = DSS
-  colors <- append(colors, DSS_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -348,7 +381,6 @@ GO = c()
 if('GO' %in% models) {
   GO <- GO_FI(GO_BM_MLE(FT),d)[,2];
   modelList[[modelIterator]] = GO
-  colors <- append(colors, GO_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -356,7 +388,6 @@ JM = c()
 if('JM' %in% models) { 
   JM <- JM_FI(JM_BM_MLE(IF),d)[,2]; 
   modelList[[modelIterator]] = JM
-  colors <- append(colors, JM_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -364,7 +395,6 @@ GM = c()
 if('GM' %in% models) { 
   GM <- GM_FI(GM_BM_MLE(IF),d)[,2]; 
   modelList[[modelIterator]] = GM
-  colors <- append(colors, GM_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -372,40 +402,44 @@ Wei = c()
 if('Wei' %in% models) { 
   Wei <- Wei_FI(Wei_NM_MLE(FT),d)[,2]; 
   modelList[[modelIterator]] = Wei
-  colors <- append(colors, Wei_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
 hxy <- data.frame(modelList)
 ntrees <- length(models)
 
+tempFI <- 1/IF
+tempFI[is.infinite(tempFI)] <- 0
+upLim <- max(max(Wei),max(GO),max(DSS),max(JM),max(GM))
+
 plot(
-  FT, IF, type="n",
+  FT, tempFI, type="n",ylim=c(min(tempFI),min(upLim,max(tempFI))),
   xlab="Cumulative test time", ylab="Failure intensity"
 )
 linetype <- c("p","l","o","b","c","s","S","h")  
-lines(FT, IF, type="s")
+lines(FT, tempFI, type="s")
 
 for (i in 1:ntrees) {
   lines(FT, hxy[,i], type="l", col=colors[i])
 }
 
-title("Cumualtive test time vs. Failure intensity")
-legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
+title(bquote("Failure intensity vs. Cumualtive test time" ~.(SheetName)))
+legend("topright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
+
+\newpage
+##Reliability growth
 
 ```{r,echo=FALSE}
 #Mission time delta value; comes from report-specifications.R
 modelList <- list() #passed to plot
 modelIterator <- 1;
-colors <- c() #for plot line colors
 
 #Apply appropriate models comes from report-specifications.R
 DSS = c()
 if('DSS' %in% models) { 
   DSS <- DSS_R_growth(DSS_BM_MLE(FT),d, mission_time)[,2]
   modelList[[modelIterator]] = DSS
-  colors <- append(colors, DSS_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -413,7 +447,6 @@ GO = c()
 if('GO' %in% models) {
   GO <- GO_R_growth(GO_BM_MLE(FT),d,mission_time)[,2]
   modelList[[modelIterator]] = GO
-  colors <- append(colors, GO_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -421,7 +454,6 @@ JM = c()
 if('JM' %in% models) { 
   JM <- JM_R_growth(JM_BM_MLE(FT),d,mission_time)[,2]
   modelList[[modelIterator]] = JM
-  colors <- append(colors, JM_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -429,7 +461,6 @@ GM = c()
 if('GM' %in% models) {
   GM <- GM_R_growth(GM_BM_MLE(FT),d,mission_time)[,2]
   modelList[[modelIterator]] = GM
-  colors <- append(colors, GM_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -437,7 +468,6 @@ Wei = c()
 if('Wei' %in% models) { 
   Wei <- Wei_R_growth(Wei_NM_MLE(FT),d,mission_time)[,2]
   modelList[[modelIterator]] = Wei
-  colors <- append(colors, Wei_plotcolor)
   modelIterator <- modelIterator + 1
 }
 
@@ -457,14 +487,22 @@ for (i in 1:ntrees) {
   lines(FT, hxy[,i], type="l", col=colors[i]) ##Limit the upperbound to maximum value
 } 
 
-title("Reliability growth vs. cumualtive test time")
+title(bquote("Reliability growth vs. cumualtive test time" ~.(SheetName)))
 legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
-
+\newpage
 #Tab3: Query Model Results
+The plots and tabular displays of model results can provide a good overview of what the different models predict for the future failure behavior of the system being analyzing. However, there are some details that are difficult to see in the plots and tables, so the SFRAT allows detailed queries of the models to answer the following questions:
+
+How many more failures will be observed in a given amount of time?
+
+How long will it take to observe a given number of failures?
+
+How much more testing time will be needed to obtain a given reliability for a specified operating time? 
+
 ```{r,echo=FALSE}
-source(paste0(getwd(),'/SFRAT/utility/prediction/Detailed_prediction.R'))
+source('./SFRAT/utility/prediction/Detailed_prediction.R')
 
 #Setting Up The Table
 predTable <- matrix(NA, nrow = length(models) , ncol = 3)
@@ -473,7 +511,7 @@ colnames(predTable) <- c("Time to achieve specified reliability","Expected numbe
 
 ##Calulating Future Failures
 #Time to achieve specified reliability
-
+options(digits=4)
 firstCol <- c() #First column of prediction table
 
 if('DSS' %in% models) { 
@@ -500,70 +538,69 @@ predTable[,1] <- firstCol
 
 #Expected number of failures
 secondCol <- c()
-if('DSS' %in% models) { ##t_offset=10?? why??
+if('DSS' %in% models) { 
   secondCol=append(secondCol, get_prediction_k("DSS",DSS_BM_MLE(FT),additional_time_software_will_run,last(FT),length(FT)))
 }
 
 if('GO' %in% models) {
-  secondCol=append(secondCol,get_prediction_k("GO",GO_BM_MLE(FT),10,last(FT),length(FT)))
+  secondCol=append(secondCol,get_prediction_k("GO",GO_BM_MLE(FT),additional_time_software_will_run,last(FT),length(FT)))
 }
 
 if('JM' %in% models) { 
-  secondCol=append(secondCol,get_prediction_k("JM",JM_BM_MLE(IF),10,last(FT),length(FT)))
+  secondCol=append(secondCol,get_prediction_k("JM",JM_BM_MLE(IF),additional_time_software_will_run,last(FT),length(FT)))
 }
 
 if('GM' %in% models) {
-  secondCol=append(secondCol,get_prediction_k("GM",GM_BM_MLE(IF),10,last(FT),length(FT)))
+  secondCol=append(secondCol,get_prediction_k("GM",GM_BM_MLE(IF),additional_time_software_will_run,last(FT),length(FT)))
 }
 
 if('Wei' %in% models) { 
-  secondCol=append(secondCol, get_prediction_k("Wei",Wei_NM_MLE(FT),10,last(FT),length(FT)))
+  secondCol=append(secondCol, get_prediction_k("Wei",Wei_NM_MLE(FT),additional_time_software_will_run,last(FT),length(FT)))
 }
 
 predTable[,2] <- secondCol
 
-
 #Expected time to N failure
 thirdCol <- c()
 if('DSS' %in% models) { 
-  thirdCol=append(thirdCol,get_prediction_t("DSS",DSS_BM_MLE(FT),num_failures_future_prediction,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("DSS",DSS_BM_MLE(FT),num_failures_to_predict,last(FT),length(FT))))
 }
 
 if('GO' %in% models) {
-  thirdCol=append(thirdCol,get_prediction_t("GO",GO_BM_MLE(FT),num_failures_future_prediction,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("GO",GO_BM_MLE(FT),num_failures_to_predict,last(FT),length(FT))))
 }
 
 if('JM' %in% models) { 
-  thirdCol=append(thirdCol,get_prediction_t("JM",JM_BM_MLE(IF),num_failures_future_prediction,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("JM",JM_BM_MLE(IF),num_failures_to_predict,last(FT),length(FT))))
 }
 
 if('GM' %in% models) {
-  thirdCol=append(thirdCol,get_prediction_t("GM",GM_BM_MLE(IF),num_failures_future_prediction,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("GM",GM_BM_MLE(IF),num_failures_to_predict,last(FT),length(FT))))
 }
 
 if('Wei' %in% models) { 
-  thirdCol=append(thirdCol,get_prediction_t("Wei",Wei_NM_MLE(FT),num_failures_future_prediction,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("Wei",Wei_NM_MLE(FT),num_failures_to_predict,last(FT),length(FT))))
 }
-
 
 predTable[,3] <- thirdCol
 
 #As of now, the table can only hold a single value
 #TODO:multiple rows for each falure prediction
 
-kable(predTable)
+kable(predTable,align='r',digits=4)
 ```
 
-
+\newpage
 # Tab4: Evaluate Models
-##Smaller values of AIC and PSSE values are preferred.
+After applying one or more models to a set of failure data, the user can assess which model or models produce better predictions. This version of the SFRAT includes two methods to evaluate the performance of the models to identify those that will provide better predictions – the Akaike Information Criterion (AIC) and Predictive Sum of Squared Error (PSSE).
+
 ```{r,echo=FALSE}
 
-source(paste0(getwd(),'/SFRAT/utility/metrics/GOF.R'))
+source('./SFRAT/utility/metrics/GOF.R')
 #Setup Table
 GOFTable <- matrix(NA, nrow = length(models), ncol = 2)
 rownames(GOFTable) <- models
-colnames(GOFTable) <- c("AIC", "PSSE")
+colnames(GOFTable) <- c(bquote("Akaike Information Criterion (AIC)"), bquote("Predictive sum of squares error (PSSE)" ~.(percent_data_for_PSSE)))
 
 #Calculate AIC
 GOFFirstCol <- c()
@@ -586,12 +623,23 @@ if('GM' %in% models) {
 if('Wei' %in% models) { 
   GOFFirstCol=append(GOFFirstCol,aic(3, Wei_lnL(FT, Wei_NM_MLE(FT))))
 }
-GOFTable[,1] <-GOFFirstCol
+
+
+GOFFirstCol <-  round(GOFFirstCol,digits=2)
+fircol <- c()
+for(i in 1:length(models)){
+  if(GOFFirstCol[i]==min(GOFFirstCol)){
+    fircol <- append(fircol,paste(c("*",GOFFirstCol[i]),collapse=""))
+  }else{
+    fircol <- append(fircol,GOFFirstCol[i])
+  }
+  i=i+1;
+}
+GOFTable[,1] <- fircol
 
 #Calculate PSSE
 GOFSecondCol <- c()
-if('DSS' %in% models) {
-  
+if('DSS' %in% models) { 
   GOFSecondCol=append(GOFSecondCol,psse("DSS", FT, DSS_BM_MLE(FT), percent_data_for_PSSE))
 }
 
@@ -610,7 +658,23 @@ if('GM' %in% models) {
 if('Wei' %in% models) { 
   GOFSecondCol=append(GOFSecondCol, psse("Wei", FT, Wei_NM_MLE(FT), percent_data_for_PSSE))
 }
-GOFTable[,2] <-GOFSecondCol
 
-kable(GOFTable)
+GOFSecondCol <-  round(GOFSecondCol,digits=2)
+seccol <- c()
+for(i in 1:length(models)){
+  if(GOFSecondCol[i]==min(GOFSecondCol)){
+    seccol <- append(seccol,paste(c("*",GOFSecondCol[i]),collapse=""))
+  }else{
+    seccol <- append(seccol,GOFSecondCol[i])
+  }
+  i=i+1;
+}
+
+GOFTable[,2] <- seccol
+
+kable(GOFTable,align='r')
+
 ```
+
+
+##Smaller values of AIC and PSSE values are preferred.

@@ -1,6 +1,7 @@
 library(knitr)
 library(markdown)
 library(rmarkdown)
+library(readxl)
 source("report-specifications.R")
 
 x <- menu(c("Type '1' for Yes", "Type '0' for No"), title="Display verbose report?")

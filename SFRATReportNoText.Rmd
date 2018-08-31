@@ -1,7 +1,7 @@
 ---
 title: 'Software Failure and Reliability Assessment Tool: Report'
 author: "xxx"
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
+date: '`r format(Sys.time(), "%Y-%m-%d_%H:%M")`'
 output:
   pdf_document: default
 ---
@@ -30,7 +30,7 @@ source('report-specifications.R')
 
 ```{r, echo=FALSE}
 ##DATA PREPROCESSING
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/utility/data/Data_Tools.R')
+source('./SFRAT/utility/data/Data_Tools.R')
 
 #Input excel file with a single sheet for now
 d <- dataset
@@ -87,6 +87,7 @@ list(data.frame("FT"=head(FT),"IF"=head(IF),"FN"=head(FN)),data.frame("FC"=head(
 }
 ```
 
+\newpage
 ##Cumulative failures 
 
 ```{r, echo=FALSE}
@@ -97,6 +98,7 @@ plot(
 )
 ```
 
+\newpage
 ##Times between failures/Interfailure times
 
 ```{r, echo=FALSE}
@@ -107,6 +109,7 @@ plot(
 )
 ```
 
+\newpage
 ##Failure intensity
 
 ```{r, echo=FALSE}
@@ -172,6 +175,7 @@ localTrendPlot <-
 localTrendPlot
 ```
 
+\newpage
 ##Running arithmetic average
 
 ```{r,echo=FALSE}
@@ -202,18 +206,19 @@ plot(
 
 ```{r, echo=FALSE}
 #Add in models to be used
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/DSS/DSS_BM_FT.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/DSS/Model_specifications.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/GO/GO_BM_FT.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/GO/Model_specifications.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/JM/JM_BM.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/JM/Model_specifications.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/GM/GM_BM.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/GM/Model_specifications.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/Wei/Wei_NM_FT.R')
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/models/Wei/Model_specifications.R')
+source('./SFRAT/models/DSS/DSS_BM_FT.R')
+source('./SFRAT/models/DSS/Model_specifications.R')
+source('./SFRAT/models/GO/GO_BM_FT.R')
+source('./SFRAT/models/GO/Model_specifications.R')
+source('./SFRAT/models/JM/JM_BM.R')
+source('./SFRAT/models/JM/Model_specifications.R')
+source('./SFRAT/models/GM/GM_BM.R')
+source('./SFRAT/models/GM/Model_specifications.R')
+source('./SFRAT/models/Wei/Wei_NM_FT.R')
+source('./SFRAT/models/Wei/Model_specifications.R')
 ```
 
+\newpage
 ##Cumulative failures
 
 ```{r, echo=FALSE}
@@ -284,6 +289,7 @@ title(bquote("Cumualtive failures vs. cumualtive test time:" ~.(SheetName)))
 legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
+\newpage
 ##Times between failures
 
 ```{r,echo=FALSE}
@@ -345,6 +351,7 @@ title(bquote("Times between failures vs. cumualtive test time" ~.(SheetName)))
 legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
+\newpage
 ##Failure intensity
 
 ```{r, echo=FALSE}
@@ -391,21 +398,26 @@ if('Wei' %in% models) {
 hxy <- data.frame(modelList)
 ntrees <- length(models)
 
+tempFI <- 1/IF
+tempFI[is.infinite(tempFI)] <- 0
+upLim <- max(max(Wei),max(GO),max(DSS),max(JM),max(GM))
+
 plot(
-  FT, IF, type="n",
+  FT, tempFI, type="n",ylim=c(min(tempFI),min(upLim,max(tempFI))),
   xlab="Cumulative test time", ylab="Failure intensity"
 )
 linetype <- c("p","l","o","b","c","s","S","h")  
-lines(FT, IF, type="s")
+lines(FT, tempFI, type="s")
 
 for (i in 1:ntrees) {
   lines(FT, hxy[,i], type="l", col=colors[i])
 }
 
 title(bquote("Failure intensity vs. Cumualtive test time" ~.(SheetName)))
-legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
+legend("topright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
+\newpage
 ##Reliability growth
 
 ```{r,echo=FALSE}
@@ -473,7 +485,7 @@ legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 #Tab3: Query Model Results
 
 ```{r,echo=FALSE}
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/utility/prediction/Detailed_prediction.R')
+source('./SFRAT/utility/prediction/Detailed_prediction.R')
 
 #Setting Up The Table
 predTable <- matrix(NA, nrow = length(models) , ncol = 3)
@@ -534,23 +546,23 @@ predTable[,2] <- secondCol
 #Expected time to N failure
 thirdCol <- c()
 if('DSS' %in% models) { 
-  thirdCol=append(thirdCol,get_prediction_t("DSS",DSS_BM_MLE(FT),num_failures_to_predict,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("DSS",DSS_BM_MLE(FT),num_failures_to_predict,last(FT),length(FT))))
 }
 
 if('GO' %in% models) {
-  thirdCol=append(thirdCol,get_prediction_t("GO",GO_BM_MLE(FT),num_failures_to_predict,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("GO",GO_BM_MLE(FT),num_failures_to_predict,last(FT),length(FT))))
 }
 
 if('JM' %in% models) { 
-  thirdCol=append(thirdCol,get_prediction_t("JM",JM_BM_MLE(IF),num_failures_to_predict,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("JM",JM_BM_MLE(IF),num_failures_to_predict,last(FT),length(FT))))
 }
 
 if('GM' %in% models) {
-  thirdCol=append(thirdCol,get_prediction_t("GM",GM_BM_MLE(IF),num_failures_to_predict,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("GM",GM_BM_MLE(IF),num_failures_to_predict,last(FT),length(FT))))
 }
 
 if('Wei' %in% models) { 
-  thirdCol=append(thirdCol,get_prediction_t("Wei",Wei_NM_MLE(FT),num_failures_to_predict,last(FT),length(FT)))
+  thirdCol=append(thirdCol,last(get_prediction_t("Wei",Wei_NM_MLE(FT),num_failures_to_predict,last(FT),length(FT))))
 }
 
 predTable[,3] <- thirdCol
@@ -558,7 +570,7 @@ predTable[,3] <- thirdCol
 #As of now, the table can only hold a single value
 #TODO:multiple rows for each falure prediction
 
-kable(predTable,align='r')
+kable(predTable,align='r',digits=4)
 ```
 
 \newpage
@@ -566,7 +578,7 @@ kable(predTable,align='r')
 
 ```{r,echo=FALSE}
 
-source('/Users/vnagaraju/Downloads/SFRAT_Automated-Report-Generation-master-3/SFRAT/utility/metrics/GOF.R')
+source('./SFRAT/utility/metrics/GOF.R')
 #Setup Table
 GOFTable <- matrix(NA, nrow = length(models), ncol = 2)
 rownames(GOFTable) <- models
