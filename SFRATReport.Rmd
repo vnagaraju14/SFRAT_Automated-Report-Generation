@@ -1,7 +1,6 @@
 ---
 title: 'Software Failure and Reliability Assessment Tool: Report'
 author: "xxx"
-date: '`r format(Sys.time(), "%Y-%m-%d_%H:%M")`'
 output:
   pdf_document: default
 ---
@@ -19,7 +18,7 @@ library(ggplot2)
 library(rootSolve)
 library(readxl)
 library(knitr)
-opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE)
+#opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE)
 ```
 
 ```{r, include=FALSE}
@@ -78,7 +77,7 @@ d <- data.frame("FN"=FN,"IF"=IF,"FT"=FT)
 #Tab 1: Select, Apply, and Analyze Data
 
 ##Sample of the updated data ('`r SheetName`') in different formats:
-The table below shows the first ten points of the input data '`r SheetName`'. `FC', `CFC', `FT', `IF', and `FN' indicates failure counts, cumulative failure counts, failure times, interfailure times, and number of failures respectively. 
+`r if (x==1){paste0("The table below shows the first ten points of the input data ",SheetName,". 'FC', 'CFC', 'FT', 'IF', and 'FN' indicates failure counts, cumulative failure counts, failure times, interfailure times, and number of failures respectively.")}`
 
 
 ```{r, echo=FALSE}
@@ -91,7 +90,7 @@ list(data.frame("FT"=head(FT),"IF"=head(IF),"FN"=head(FN)),data.frame("FC"=head(
 
 \newpage
 ##Cumulative failures
-Figure below shows the cumulative number of failures as a function a cumulative test time for '`r SheetName`'. Increasing trend indicates detection of more failures. Ideally, the cumulative failure should converge to a constant value as testing progresses indicating zero number of failures in the software.
+`r if (x==1){paste0("Figure below shows the cumulative number of failures as a function a cumulative test time for '",SheetName,"'. Increasing trend indicates detection of more failures. Ideally, the cumulative failure should converge to a constant value as testing progresses indicating zero number of failures in the software.")}`
 
 ```{r, echo=FALSE}
 plot(
@@ -103,7 +102,10 @@ plot(
 
 \newpage
 ##Times between failures/Interfailure times
-Ideally, times between failures should increase over time.
+
+
+`r if (x==1) {"Ideally, times between failures should increase over time."}`
+
 
 ```{r, echo=FALSE}
 plot(
@@ -115,7 +117,7 @@ plot(
 
 \newpage
 ##Failure intensity
-Decrease in failure intensity indicates increase in reliability of the software subjected to testing. Ideally, failure intensity should go to zero.
+`r if (x==1){paste0("Decrease in failure intensity indicates increase in reliability of the software subjected to testing. Ideally, failure intensity should go to zero.")}`
 
 ```{r, echo=FALSE}
 plot(
@@ -127,9 +129,8 @@ plot(
 
 \newpage
 ##Laplace Trend Test
-The red horizontal line in the figure indicates the specified confidence level of `r percent_data_for_PSSE*100`%. Additional default levels in black include 90, 95, 99, 99.9, 99.9999, and 99.999999. Values below these lines indicates that the data exhibits reliability growth with the specified level of statistical significance and it is therefore suitable to apply software reliabity models. 
-
-If the Laplace test statistic increases above the horizontal red line, this indicates that the data does not exhibit reliability growth. Thus, it is unlikely that a model can be applied successfully because the results may be inaccurate.
+`r if (x==1){paste0("The red horizontal line in the figure indicates the specified confidence level of ",percent_data_for_PSSE*100,"%. Additional default levels in black include 90, 95, 99, 99.9, 99.9999, and 99.999999. Values below these lines indicates that the data exhibits reliability growth with the specified level of statistical significance and it is therefore suitable to apply software reliabity models. \n\n 
+If the Laplace test statistic increases above the horizontal red line, this indicates that the data does not exhibit reliability growth. Thus, it is unlikely that a model can be applied successfully because the results may be inaccurate.")}`
 
 ```{r, echo=FALSE}
 laplace_trend_test <- function(inter_failure) {
@@ -185,7 +186,8 @@ localTrendPlot
 
 \newpage
 ##Running arithmetic average
-The running arithmetic average, computes and plots a running average of the times between failures. Intuitively, if the time between failures increases then the running arithmetic average increases, indicating system reliability is improving. A decreasing running arithmetic average indicates reliability deterioration.
+
+`r if (x==1){paste0("The running arithmetic average, computes and plots a running average of the times between failures. Intuitively, if the time between failures increases then the running arithmetic average increases, indicating system reliability is improving. A decreasing running arithmetic average indicates reliability deterioration.")}`
 
 
 ```{r,echo=FALSE}
@@ -229,7 +231,7 @@ source('./SFRAT/models/Wei/Model_specifications.R')
 ```
 
 ##Cumulative failures
-The figure show model result plots for the input data '`r SheetName`'. Models `r models_to_apply` are applied. 
+`r if (x==1){paste0("The figure shows model result plots for the input data ",SheetName,". Models ",paste(models_to_apply, collapse=", "), " are applied.")}`
 
 ```{r, echo=FALSE}
 models <- c() #used for legend
@@ -493,13 +495,10 @@ legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 
 \newpage
 #Tab3: Query Model Results
-The plots and tabular displays of model results can provide a good overview of what the different models predict for the future failure behavior of the system being analyzing. However, there are some details that are difficult to see in the plots and tables, so the SFRAT allows detailed queries of the models to answer the following questions:
-
-How many more failures will be observed in a given amount of time?
-
-How long will it take to observe a given number of failures?
-
-How much more testing time will be needed to obtain a given reliability for a specified operating time? 
+`r if (x==1){paste0("The plots and tabular displays of model results can provide a good overview of what the different models predict for the future failure behavior of the system being analyzing. However, there are some details that are difficult to see in the plots and tables, so the SFRAT allows detailed queries of the models to answer the following questions:\n
+How many more failures will be observed in a given amount of time?\n
+How long will it take to observe a given number of failures?\n
+How much more testing time will be needed to obtain a given reliability for a specified operating time? \n")}`
 
 ```{r,echo=FALSE}
 source('./SFRAT/utility/prediction/Detailed_prediction.R')
@@ -592,7 +591,7 @@ kable(predTable,align='r',digits=4)
 
 \newpage
 # Tab4: Evaluate Models
-After applying one or more models to a set of failure data, the user can assess which model or models produce better predictions. This version of the SFRAT includes two methods to evaluate the performance of the models to identify those that will provide better predictions – the Akaike Information Criterion (AIC) and Predictive Sum of Squared Error (PSSE).
+`r if (x==1){paste0("After applying one or more models to a set of failure data, the user can assess which model or models produce better predictions. This version of the SFRAT includes two methods to evaluate the performance of the models to identify those that will provide better predictions – the Akaike Information Criterion (AIC) and Predictive Sum of Squared Error (PSSE).")}`
 
 ```{r,echo=FALSE}
 
