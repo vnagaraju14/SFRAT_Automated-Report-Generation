@@ -5,7 +5,7 @@ library(readxl)
 library(formatR)
 
 #Preliminary
-datapath <- paste0(getwd(), '/SFRAT/model_testing/model_data.xlsx')#path to the dataset
+datapath <- paste0(getwd(), '/SFRAT/model_testing/SYS1_data.xlsx')#path to the dataset
 
 datasettemp <- read_excel(datapath,sheet = 1)  #Specify the sheet with the data
 SheetName<-excel_sheets(path=datapath)[1] #Specify the sheet selected in the above line
