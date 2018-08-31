@@ -1,6 +1,7 @@
 ---
 title: 'Software Failure and Reliability Assessment Tool: Report'
 author: "xxx"
+date: '`r format(Sys.time(), "%Y-%m-%d_%H:%M")`'
 output:
   pdf_document: default
 ---
@@ -18,13 +19,13 @@ library(ggplot2)
 library(rootSolve)
 library(readxl)
 library(knitr)
-#opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE)
+opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE)
 ```
 
 ```{r, include=FALSE}
 ##Report Specications file
 #Contains arguments to key variables that effect the way the report is generated
-source('report-specifications.R')
+#source('report-specifications.R')
 ```
 
 ```{r, echo=FALSE}
@@ -242,7 +243,7 @@ modelIterator <- 1;
 
 #Apply appropriate models comes from report-specifications.R
   DSS = c()
-  if('DSS' %in% models_to_apply && DSS_BM_MLE(FT)!="nonconvergence") { 
+  if('DSS' %in% models_to_apply && DSS_BM_MLE(FT)!="nonconvergence"&&!is.na(DSS_lnL(FT, DSS_BM_MLE(FT)))&& !is.na(DSS_BM_MLE(FT))) { 
     DSS <-  DSS_MVF(DSS_BM_MLE(FT),d)[,2]
     modelList[[modelIterator]] = DSS
     models <- append(models, "DSS")
@@ -251,7 +252,7 @@ modelIterator <- 1;
   }
 
   GO = c()
-  if('GO' %in% models_to_apply && GO_BM_MLE(FT)!="nonconvergence") {
+  if('GO' %in% models_to_apply && GO_BM_MLE(FT)!="nonconvergence"&&!is.na(GO_lnL(FT, GO_BM_MLE(FT)))&&!is.na(GO_BM_MLE(FT))) {
     GO <- GO_MVF(GO_BM_MLE(FT),d)[,1]
     modelList[[modelIterator]] = GO
     models <- append(models, "GO")
@@ -260,7 +261,7 @@ modelIterator <- 1;
   }
 
   JM = c()
-  if('JM' %in% models_to_apply && JM_BM_MLE(IF)!="nonconvergence") { 
+  if('JM' %in% models_to_apply && JM_BM_MLE(IF)!="nonconvergence"&&!is.na(JM_lnL(IF, JM_BM_MLE(IF)))&&!is.na(JM_BM_MLE(IF))) { 
     JM <- JM_MVF(JM_BM_MLE(IF),d)[,1]
     modelList[[modelIterator]] = JM
     models <- append(models, "JM")
@@ -269,7 +270,7 @@ modelIterator <- 1;
   }
 
   GM = c()
-  if('GM' %in% models_to_apply && GM_BM_MLE(IF)!="nonconvergence") { 
+  if('GM' %in% models_to_apply && GM_BM_MLE(IF)!="nonconvergence"&&!is.na(GM_lnL(IF, GM_BM_MLE(IF)))&&!is.na(GM_BM_MLE(IF))) { 
     GM <- GM_MVF(GM_BM_MLE(IF),d)[,2]
     modelList[[modelIterator]] = GM
     models <- append(models, "GM")
@@ -278,7 +279,7 @@ modelIterator <- 1;
   }
 
   Wei = c()
-  if('Wei' %in% models_to_apply && Wei_NM_MLE(FT)!="nonconvergence") { 
+  if('Wei' %in% models_to_apply && Wei_NM_MLE(FT)!="nonconvergence"&&!is.na(Wei_lnL(FT, Wei_NM_MLE(FT)))&&!is.na(Wei_NM_MLE(FT))) { 
     Wei <- Wei_MVF(Wei_NM_MLE(FT),d)[,2]
     modelList[[modelIterator]] = Wei
     models <- append(models, "Wei") 
@@ -346,6 +347,7 @@ if('Wei' %in% models) {
 }
 
 hxy <- data.frame(modelList)
+hxy[is.na(hxy)] <- 0
 ntrees <- length(models)
 
 plot(
@@ -408,6 +410,7 @@ if('Wei' %in% models) {
 }
 
 hxy <- data.frame(modelList)
+hxy[is.na(hxy)] <- 0
 ntrees <- length(models)
 
 tempFI <- 1/IF
@@ -474,6 +477,7 @@ if('Wei' %in% models) {
 }
 
 hxy <- data.frame(modelList)
+hxy[is.na(hxy)] <- 0
 ntrees <- length(hxy)
 
 plot(
