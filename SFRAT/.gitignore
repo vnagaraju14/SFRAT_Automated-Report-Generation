@@ -1,0 +1,7 @@
+.Rproj.user
+.Rhistory
+.RData
+SRT.Rproj
+*.out
+shiny-server.conf
+*.swp

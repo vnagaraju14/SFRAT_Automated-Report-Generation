@@ -1,0 +1,53 @@
+language: r
+
+# Be strict when checking our package
+warnings_are_errors: true
+
+# Run as super user
+sudo: required
+
+dist: trusty
+# System dependencies for HTTP calling
+
+
+apt_packages:
+ - build-dep
+ - libcurl4-gnutls-dev
+ - libcurl4-openssl-dev
+ - libxml2-dev
+ - r-base
+
+
+
+r_binary_packages:
+  - RUnit
+
+# before_script:
+#   - sudo add-apt-repository ppa:marutter/rrutter -y
+#   - sudo apt-get update
+#   - sudo apt-get upgrade -y
+
+# Should be changed to install_script.R
+install:
+  - ./install_script.R
+
+
+# r_github_packages:
+# 	- hadley/testthat
+
+script: Rscript ./run_tests.R
+
+notifications:
+  slack: softrel:KUgAGUe63BGVHuMGr2cIk0B3
+
+notifications:
+  email:
+    - karthik.katipalli@gmail.com
+    - lfiondella@umassd.edu
+    - rdavis2@umassd.edu
+    - vnagaraju@umassd.edu
+    - rmuri@umassd.edu
+    - dgarcia1@umassd.edu
+
+
+
