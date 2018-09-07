@@ -52,6 +52,9 @@ if (xy==1) {
   
 } else {
   dataset <- read_excel(datapath,sheet = 1)
+  rmarkdown::render(paste0(getwd(),'/SFRATReport.Rmd'),  
+                    output_file =  paste("SFRAT report_", SheetName,'_', Sys.Date(), ".pdf", sep=''), 
+                    output_dir = './Reports') 
 }
 
 
