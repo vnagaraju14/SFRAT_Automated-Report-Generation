@@ -45,7 +45,7 @@ get_prediction_t <- function(model, params, faults, tn, n){
 					time_indexes[i] <- t
 				}
 				else{
-					time_indexes[i] <- "NA"
+					time_indexes[i] <- NA
 				}
 		}
 	}
@@ -136,7 +136,7 @@ est_t <- function(model,params,tn,steps){
 	      }
 	    },
 	    error = function(e){
-	      return("NA")
+	      return(NA)
 	      #return(e)
 	    })
 	} else {

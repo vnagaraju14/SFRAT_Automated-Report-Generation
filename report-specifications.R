@@ -14,7 +14,7 @@ colors <- c("navy","red","green","firebrick4","magenta")
 confidence_lvl <- .9 #float
 
 # TAB 2
-num_failures_future_prediction <- 1
+num_failures_future_prediction <- 2
 models_to_apply <- c('DSS', 'GM', 'Wei','GO','JM') #vector
 mission_time <- 600
 

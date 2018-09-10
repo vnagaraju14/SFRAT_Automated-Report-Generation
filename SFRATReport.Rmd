@@ -19,6 +19,7 @@ library(ggplot2)
 library(rootSolve)
 library(readxl)
 library(knitr)
+
 opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE)
 ```
 
@@ -244,7 +245,18 @@ modelIterator <- 1;
 #Apply appropriate models comes from report-specifications.R
   DSS = c()
   if('DSS' %in% models_to_apply && DSS_BM_MLE(FT)!="nonconvergence"&&!is.na(DSS_lnL(FT, DSS_BM_MLE(FT)))&& !is.na(DSS_BM_MLE(FT))) { 
-    DSS <-  DSS_MVF(DSS_BM_MLE(FT),d)[,2]
+    pred_failure_times <- get_prediction_t("DSS",DSS_BM_MLE(FT),num_failures_future_prediction,last(FT),length(FT))
+    
+    pred_failure_times[is.na(pred_failure_times)] <- 0
+    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
+    pred_failure_times <- cumsum(pred_failure_times)
+    
+    complete_ft <- c(FT, pred_failure_times)
+    temp_d <- data.frame("FT"=complete_ft)
+
+    DSS <-  DSS_MVF(DSS_BM_MLE(FT),temp_d)[,2]
+    print(DSS)
+    print(length(DSS))
     modelList[[modelIterator]] = DSS
     models <- append(models, "DSS")
     #colors <- append(colors, DSS_plotcolor)
@@ -253,7 +265,17 @@ modelIterator <- 1;
 
   GO = c()
   if('GO' %in% models_to_apply && GO_BM_MLE(FT)!="nonconvergence"&&!is.na(GO_lnL(FT, GO_BM_MLE(FT)))&&!is.na(GO_BM_MLE(FT))) {
-    GO <- GO_MVF(GO_BM_MLE(FT),d)[,1]
+    pred_failure_times <- get_prediction_t("GO",GO_BM_MLE(FT),num_failures_future_prediction,last(FT),length(FT))
+    
+    pred_failure_times[is.na(pred_failure_times)] <- 0
+    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
+    pred_failure_times <- cumsum(pred_failure_times)
+    complete_ft <- c(FT, pred_failure_times)
+   
+    temp_d <- data.frame("FT"=complete_ft)
+
+    GO <- GO_MVF(GO_BM_MLE(FT),temp_d)[,1]
+    
     modelList[[modelIterator]] = GO
     models <- append(models, "GO")
    # colors <- append(colors, GO_plotcolor)
@@ -262,7 +284,17 @@ modelIterator <- 1;
 
   JM = c()
   if('JM' %in% models_to_apply && JM_BM_MLE(IF)!="nonconvergence"&&!is.na(JM_lnL(IF, JM_BM_MLE(IF)))&&!is.na(JM_BM_MLE(IF))) { 
-    JM <- JM_MVF(JM_BM_MLE(IF),d)[,1]
+    pred_failure_times <- get_prediction_t("JM",JM_BM_MLE(IF),num_failures_future_prediction,last(FT),length(FT))
+    pred_failure_times[is.na(pred_failure_times)] <- 0
+    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
+    pred_failure_times <- cumsum(pred_failure_times)
+    complete_ft <- c(FT, pred_failure_times)
+    complete_if <- FT_to_IF(complete_ft)
+        
+    temp_d <- data.frame("IF"=complete_if, "FT"=complete_ft)
+
+    JM <- JM_MVF(JM_BM_MLE(IF),temp_d)[,1]
+        
     modelList[[modelIterator]] = JM
     models <- append(models, "JM")
     #colors <- append(colors, JM_plotcolor)
@@ -271,7 +303,18 @@ modelIterator <- 1;
 
   GM = c()
   if('GM' %in% models_to_apply && GM_BM_MLE(IF)!="nonconvergence"&&!is.na(GM_lnL(IF, GM_BM_MLE(IF)))&&!is.na(GM_BM_MLE(IF))) { 
-    GM <- GM_MVF(GM_BM_MLE(IF),d)[,2]
+    pred_failure_times <- get_prediction_t("GM",GM_BM_MLE(IF),num_failures_future_prediction,last(FT),length(FT))
+    
+    pred_failure_times[is.na(pred_failure_times)] <- 0
+    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
+    pred_failure_times <- cumsum(pred_failure_times)
+    complete_ft <- c(FT, pred_failure_times)
+    complete_if <- FT_to_IF(complete_ft)
+
+    temp_d <- data.frame("IF"=complete_if, "FT"=complete_ft)
+
+    GM <- GM_MVF(GM_BM_MLE(IF),temp_d)[,2]
+    
     modelList[[modelIterator]] = GM
     models <- append(models, "GM")
    # colors <- append(colors, GM_plotcolor)
@@ -280,30 +323,48 @@ modelIterator <- 1;
 
   Wei = c()
   if('Wei' %in% models_to_apply && Wei_NM_MLE(FT)!="nonconvergence"&&!is.na(Wei_lnL(FT, Wei_NM_MLE(FT)))&&!is.na(Wei_NM_MLE(FT))) { 
-    Wei <- Wei_MVF(Wei_NM_MLE(FT),d)[,2]
+    pred_failure_times <- get_prediction_t("Wei",Wei_NM_MLE(FT),num_failures_future_prediction,last(FT),length(FT))
+    
+    pred_failure_times[is.na(pred_failure_times)] <- 0
+    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
+    pred_failure_times <- cumsum(pred_failure_times)
+    complete_ft <- c(FT, pred_failure_times)
+
+    temp_d <- data.frame("FT"=complete_ft)
+    Wei <- Wei_MVF(Wei_NM_MLE(FT),temp_d)[,2]
+
     modelList[[modelIterator]] = Wei
     models <- append(models, "Wei") 
     #colors <- append(colors, Wei_plotcolor)
     modelIterator <- modelIterator + 1
   }
 
-hxy <- data.frame(modelList)
-ntrees <- length(models)
+#get_prediction
 
-plot(FT,FN, type="n",xlab="Cumulative test time", ylab="Cumulative failures")
+hxy <- data.frame(modelList)
+#ntrees <- length(models)
+
+#Plot 1 tab2
+plot(complete_ft,1:length(complete_ft), type="n",xlab="Cumulative test time", ylab="Cumulative failures")
 linetype <- c("p","l","o","b","c","s","S","h")  
 lines(FT, FN, type="s")
 
 for (i in 1:ntrees) {
-  lines(FT, hxy[,i], type="l", col=colors[i])
+  lines(complete_ft, hxy[,i], type="l", col=colors[i])
+#  print(length(complete_ft))
+#  print(length(hxy[,i]))
 }
 
-title(bquote("Cumualtive failures vs. cumualtive test time:" ~.(SheetName)))
+abline(v = tail(FT, n=1))
+
+title(bquote("Cumulative failures vs. cumulative test time:" ~.(SheetName)))
 legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
+
 \newpage
 ##Times between failures
+
 
 `r if (x==1){paste0("The following figure shows the ",paste(models_to_apply, collapse=", "), " models fit to the times between failures detected in the ",SheetName," data.")}`
 
@@ -311,7 +372,6 @@ legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 modelList <- list() #passed to plot
 modelIterator <- 1; #used for creating a list
 #colors <- c("navy","red","green","firebrick4","magenta")
-
 #Apply appropriate models comes from report-specifications.R
 DSS = c()
 if('DSS' %in% models) { 
@@ -352,6 +412,7 @@ hxy <- data.frame(modelList)
 hxy[is.na(hxy)] <- 0
 ntrees <- length(models)
 
+#Plot 2 tab2
 plot(
   FT, IF, type="n",
   xlab="Cumulative test time", ylab="Times between failures"
@@ -362,8 +423,9 @@ lines(FT, IF, type="s")
 for (i in 1:ntrees) {
   lines(FT, hxy[,i], type="l", col=colors[i])
 }
+abline(v = tail(FT, n=1))
 
-title(bquote("Times between failures vs. cumualtive test time" ~.(SheetName)))
+title(bquote("Times between failures vs. cumulative test time" ~.(SheetName)))
 legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
@@ -375,8 +437,6 @@ legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```{r, echo=FALSE}
 modelList <- list() #passed to plot
 modelIterator <- 1;
-
-
 #Apply appropriate models comes from report-specifications.R
 DSS = c()
 if('DSS' %in% models) { 
@@ -421,6 +481,7 @@ tempFI <- 1/IF
 tempFI[is.infinite(tempFI)] <- 0
 upLim <- max(max(Wei),max(GO),max(DSS),max(JM),max(GM))
 
+#Plot 3 tab2
 plot(
   FT, tempFI, type="n",ylim=c(min(tempFI),min(upLim,max(tempFI))),
   xlab="Cumulative test time", ylab="Failure intensity"
@@ -432,7 +493,9 @@ for (i in 1:ntrees) {
   lines(FT, hxy[,i], type="l", col=colors[i])
 }
 
-title(bquote("Failure intensity vs. Cumualtive test time" ~.(SheetName)))
+abline(v = tail(FT, n=1))
+
+title(bquote("Failure intensity vs. Cumulative test time" ~.(SheetName)))
 legend("topright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
@@ -446,7 +509,6 @@ legend("topright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 #Mission time delta value; comes from report-specifications.R
 modelList <- list() #passed to plot
 modelIterator <- 1;
-
 #Apply appropriate models comes from report-specifications.R
 DSS = c()
 if('DSS' %in% models) { 
@@ -487,6 +549,7 @@ hxy <- data.frame(modelList)
 hxy[is.na(hxy)] <- 0
 ntrees <- length(hxy)
 
+#Plot 4 tab2
 plot(
   FT, 
   seq(from=0, to=max(hxy), by=max(hxy)/(length(FT)-1)),
@@ -500,7 +563,9 @@ for (i in 1:ntrees) {
   lines(FT, hxy[,i], type="l", col=colors[i]) ##Limit the upperbound to maximum value
 } 
 
-title(bquote("Reliability growth vs. cumualtive test time" ~.(SheetName)))
+abline(v = tail(FT, n=1))
+
+title(bquote("Reliability growth vs. cumulative test time" ~.(SheetName)))
 legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
