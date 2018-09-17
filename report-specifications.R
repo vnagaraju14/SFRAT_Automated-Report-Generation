@@ -3,6 +3,12 @@ library(markdown)
 library(rmarkdown)
 library(readxl)
 library(formatR)
+library(shiny)
+library(DT)
+library(gdata)
+library(ggplot2)
+library(rootSolve)
+
 
 #Preliminary
 datapath <- paste0(getwd(), '/SFRAT/model_testing/SYS1_data.xlsx')#path to the dataset
