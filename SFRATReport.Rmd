@@ -8,18 +8,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r, include=FALSE}
-#Libraries Needed to genereate report
-library(shiny)
-library(DT)
-library(gdata)
-library(ggplot2)
-library(rootSolve)
-library(readxl)
-library(knitr)
-
 opts_chunk$set(tidy.opts=list(width.cutoff=100),tidy=TRUE)
 ```
 
@@ -230,135 +218,135 @@ source('./SFRAT/models/GM/GM_BM.R')
 source('./SFRAT/models/GM/Model_specifications.R')
 source('./SFRAT/models/Wei/Wei_NM_FT.R')
 source('./SFRAT/models/Wei/Model_specifications.R')
+source('./SFRAT/utility/prediction/Detailed_prediction.R')
 ```
 
 ##Cumulative failures
 `r if (x==1){paste0("The following figure shows the ",paste(models_to_apply, collapse=", "), " models fit to the cumulative number of failures detected in the ",SheetName," data.")}`
 
 ```{r, echo=FALSE}
-models <- c() #used for legend
-modelList <- list() #passed to plot
-modelIterator <- 1;
-#colors <- c("navy","red","green","firebrick4","magenta") #for plot line colors
-#TODO Fix title
-
-#Apply appropriate models comes from report-specifications.R
+  models <- c() #used for legend
+  modelList <- list() #passed to plot
+  ftList <- list()
+  modelIterator <- 1;#colors <- c("navy","red","green","firebrick4","magenta") #for plot line colors
   DSS = c()
   if('DSS' %in% models_to_apply && DSS_BM_MLE(FT)!="nonconvergence"&&!is.na(DSS_lnL(FT, DSS_BM_MLE(FT)))&& !is.na(DSS_BM_MLE(FT))) { 
     pred_failure_times <- get_prediction_t("DSS",DSS_BM_MLE(FT),num_failures_future_prediction,last(FT),length(FT))
     
     pred_failure_times[is.na(pred_failure_times)] <- 0
-    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
-    pred_failure_times <- cumsum(pred_failure_times)
-    
+    for(i in 1:num_failures_future_prediction){
+      pred_failure_times[i] <- pred_failure_times[i] + last(FT)
+    }
     complete_ft <- c(FT, pred_failure_times)
     temp_d <- data.frame("FT"=complete_ft)
-
+    
     DSS <-  DSS_MVF(DSS_BM_MLE(FT),temp_d)[,2]
-    print(DSS)
-    print(length(DSS))
     modelList[[modelIterator]] = DSS
+    ftList[[modelIterator]]=complete_ft
     models <- append(models, "DSS")
-    #colors <- append(colors, DSS_plotcolor)
     modelIterator <- modelIterator + 1
   }
-
+  
   GO = c()
   if('GO' %in% models_to_apply && GO_BM_MLE(FT)!="nonconvergence"&&!is.na(GO_lnL(FT, GO_BM_MLE(FT)))&&!is.na(GO_BM_MLE(FT))) {
     pred_failure_times <- get_prediction_t("GO",GO_BM_MLE(FT),num_failures_future_prediction,last(FT),length(FT))
     
     pred_failure_times[is.na(pred_failure_times)] <- 0
-    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
-    pred_failure_times <- cumsum(pred_failure_times)
+    for(i in 1:num_failures_future_prediction){
+      pred_failure_times[i] <- pred_failure_times[i] + last(FT)
+    }
     complete_ft <- c(FT, pred_failure_times)
-   
+    
     temp_d <- data.frame("FT"=complete_ft)
-
+    
     GO <- GO_MVF(GO_BM_MLE(FT),temp_d)[,1]
     
     modelList[[modelIterator]] = GO
+    ftList[[modelIterator]]=complete_ft
     models <- append(models, "GO")
-   # colors <- append(colors, GO_plotcolor)
     modelIterator <- modelIterator + 1
   }
-
+  
   JM = c()
   if('JM' %in% models_to_apply && JM_BM_MLE(IF)!="nonconvergence"&&!is.na(JM_lnL(IF, JM_BM_MLE(IF)))&&!is.na(JM_BM_MLE(IF))) { 
     pred_failure_times <- get_prediction_t("JM",JM_BM_MLE(IF),num_failures_future_prediction,last(FT),length(FT))
     pred_failure_times[is.na(pred_failure_times)] <- 0
-    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
-    pred_failure_times <- cumsum(pred_failure_times)
+    for(i in 1:num_failures_future_prediction){
+      pred_failure_times[i] <- pred_failure_times[i] + last(FT)
+    }
     complete_ft <- c(FT, pred_failure_times)
     complete_if <- FT_to_IF(complete_ft)
-        
+    
     temp_d <- data.frame("IF"=complete_if, "FT"=complete_ft)
-
+    
     JM <- JM_MVF(JM_BM_MLE(IF),temp_d)[,1]
-        
+    
     modelList[[modelIterator]] = JM
+    ftList[[modelIterator]]=complete_ft
     models <- append(models, "JM")
-    #colors <- append(colors, JM_plotcolor)
     modelIterator <- modelIterator + 1
   }
-
+  
   GM = c()
   if('GM' %in% models_to_apply && GM_BM_MLE(IF)!="nonconvergence"&&!is.na(GM_lnL(IF, GM_BM_MLE(IF)))&&!is.na(GM_BM_MLE(IF))) { 
     pred_failure_times <- get_prediction_t("GM",GM_BM_MLE(IF),num_failures_future_prediction,last(FT),length(FT))
     
     pred_failure_times[is.na(pred_failure_times)] <- 0
-    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
-    pred_failure_times <- cumsum(pred_failure_times)
+    for(i in 1:num_failures_future_prediction){
+      pred_failure_times[i] <- pred_failure_times[i] + last(FT)
+    }
     complete_ft <- c(FT, pred_failure_times)
     complete_if <- FT_to_IF(complete_ft)
-
+    
     temp_d <- data.frame("IF"=complete_if, "FT"=complete_ft)
-
+    
     GM <- GM_MVF(GM_BM_MLE(IF),temp_d)[,2]
     
     modelList[[modelIterator]] = GM
+    ftList[[modelIterator]]=complete_ft
     models <- append(models, "GM")
-   # colors <- append(colors, GM_plotcolor)
     modelIterator <- modelIterator + 1
   }
-
+  
   Wei = c()
   if('Wei' %in% models_to_apply && Wei_NM_MLE(FT)!="nonconvergence"&&!is.na(Wei_lnL(FT, Wei_NM_MLE(FT)))&&!is.na(Wei_NM_MLE(FT))) { 
     pred_failure_times <- get_prediction_t("Wei",Wei_NM_MLE(FT),num_failures_future_prediction,last(FT),length(FT))
     
     pred_failure_times[is.na(pred_failure_times)] <- 0
-    pred_failure_times[1] <- pred_failure_times[1] + last(FT)
-    pred_failure_times <- cumsum(pred_failure_times)
+    for(i in 1:num_failures_future_prediction){
+      pred_failure_times[i] <- pred_failure_times[i] + last(FT)
+    }
     complete_ft <- c(FT, pred_failure_times)
-
+    
     temp_d <- data.frame("FT"=complete_ft)
     Wei <- Wei_MVF(Wei_NM_MLE(FT),temp_d)[,2]
-
+    
     modelList[[modelIterator]] = Wei
+    ftList[[modelIterator]]=complete_ft
     models <- append(models, "Wei") 
-    #colors <- append(colors, Wei_plotcolor)
     modelIterator <- modelIterator + 1
   }
-
-#get_prediction
-
-hxy <- data.frame(modelList)
-#ntrees <- length(models)
-
-#Plot 1 tab2
-plot(complete_ft,1:length(complete_ft), type="n",xlab="Cumulative test time", ylab="Cumulative failures")
-linetype <- c("p","l","o","b","c","s","S","h")  
-lines(FT, FN, type="s")
-
-for (i in 1:ntrees) {
-  lines(complete_ft, hxy[,i], type="l", col=colors[i])
-#  print(length(complete_ft))
-#  print(length(hxy[,i]))
-}
-
-abline(v = tail(FT, n=1))
-
-title(bquote("Cumulative failures vs. cumulative test time:" ~.(SheetName)))
-legend("bottomright", legend=models, lty=c(1,1), cex=0.8, col=colors)
+  
+  #get_prediction
+  
+  hxy <- data.frame(modelList)
+  hft <- data.frame(ftList)
+  ntrees <- length(models)
+  
+  #Plot 1 tab2
+  plot(hft[,which(hft==max(hft))/dim(hft)[1]],1:dim(hft)[1], type="n",xlab="Cumulative test time", ylab="Cumulative failures")
+  linetype <- c("p","l","o","b","c","s","S","h")  
+  lines(FT, FN, type="s")
+  
+  for (i in 1:ntrees) {
+    lines(hft[,i], hxy[,i], type="l", col=colors[i])
+    #  print(length(complete_ft))
+    #  print(length(hxy[,i]))
+  }
+  abline(v = tail(FT, n=1))
+  
+  title(bquote("Cumulative failures vs. cumulative test time:" ~.(SheetName)))
+  legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
 
@@ -574,8 +562,6 @@ legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 `r if (x==1){paste0("The following table shows inferences enabled by the models, including the time to achieve a reliability of xx (probability of zero failures for xx time units), expected number of failures in the next xx time units, and expected time to observe an additional xx failures computed for the Delayed s-Shaped (DSS), Geometric (GM), Weibull (Wei), Goel-Okumoto (GO), and Jelinski-Moranda (JM) models.")}`
 
 ```{r,echo=FALSE}
-source('./SFRAT/utility/prediction/Detailed_prediction.R')
-
 #Setting Up The Table
 predTable <- matrix(NA, nrow = length(models) , ncol = 3)
 rownames(predTable) <- models
