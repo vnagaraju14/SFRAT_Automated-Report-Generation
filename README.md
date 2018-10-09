@@ -34,11 +34,14 @@ source(‘report-specifications.R’)
 
 - The report will be generated and saved in the 'Report' folder within the same directory.
 
+
 Related Resources:
+-------
 
 - [ ] In progress. Email Lance Fiondell for any questions.
 
 TODO:
+-------
 
 - [ ] Python port of this is in progress.
 - [ ] Data subsetting option to enable online data analysis is in progress.
