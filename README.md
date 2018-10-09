@@ -34,6 +34,9 @@ source(‘report-specifications.R’)
 
 - The report will be generated and saved in the 'Report' folder within the same directory.
 
+Related Resources:
+
+- [ ] In progress. Email Lance Fiondell for any questions.
 
 TODO:
 
