@@ -38,7 +38,7 @@ source(‘report-specifications.R’)
 Related Resources:
 -------
 
-- [ ] In progress. Email Lance Fiondell for any questions.
+- [ ] In progress. Email Dr. Lance Fiondella for any questions.
 
 TODO:
 -------
