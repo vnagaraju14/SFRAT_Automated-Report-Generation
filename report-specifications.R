@@ -9,7 +9,7 @@ library(gdata)
 library(ggplot2)
 library(rootSolve)
 
-datapath <- paste0(getwd(), '/SFRAT/model_testing/SYS1_data.xlsx')   #path to the dataset
+datapath <- paste0(getwd(), '/SFRAT/model_testing/model_data.xlsx')   #path to the dataset
 sheetNumber <- 1
 
 datasettemp <- read_excel(datapath,sheet = sheetNumber)  #Specify the sheet with the data
