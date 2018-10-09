@@ -349,7 +349,12 @@ legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```{r, echo=FALSE}
 tempFI <- 1/(FT_to_IF(hft[,which(hft==max(hft))/dim(hft)[1]]))
 tempFI[is.infinite(tempFI)] <- 0
-upLim <- max(max(hxyFI[,1]),max(hxyFI[,2]),max(hxyFI[,3]),max(hxyFI[,4]),max(hxyFI[,5]))
+upLimTemp <- list()
+for(i in 1:ntrees){
+  upLimTemp <- max(hxyFI[,i])
+}
+
+upLim <- max(upLimTemp)
 plot(
   hft[,which(hft==max(hft))/dim(hft)[1]], tempFI, type="n",ylim=c(min(tempFI),min(upLim,max(tempFI))),
   xlab="Cumulative test time", ylab="Failure intensity"
@@ -417,6 +422,10 @@ if('Wei' %in% models) {
   secondCol=append(secondCol, get_prediction_k("Wei",Wei_NM_MLE(FT),additional_time_software_will_run,last(FT),length(FT)))
   thirdCol=append(thirdCol,last(get_prediction_t("Wei",Wei_NM_MLE(FT),num_failures_to_predict,last(FT),length(FT))))
 }
+
+
+
+
 predTable[,1] <- firstCol
 predTable[,2] <- secondCol
 predTable[,3] <- thirdCol
