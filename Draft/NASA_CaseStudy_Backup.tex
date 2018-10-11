@@ -1,0 +1,330 @@
+\documentclass[journal]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{lipsum}
+\usepackage{bm}
+\usepackage{array}
+\usepackage{cite}
+\usepackage{gensymb}
+\usepackage[justification=centering]{caption}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Practical Software Reliability Modeling and Application: A Case Study
+\thanks{This work is supported by NASA under contract number: }
+}
+
+\author{\IEEEauthorblockN{Vidhyashree Nagaraju, Shekar, Niti and Lance Fiondella}%Should figure out alignment before adding full names
+\IEEEauthorblockA{\textit{Electrical and Computer Engineering} \\
+\textit{University of Massachusetts Dartmouth}\\
+North Dartmouth, MA, USA}
+\and
+\IEEEauthorblockN{Ying Shi}
+\IEEEauthorblockA{\textit{Goddard Space Flight Center} \\
+\textit{National Aeronautics and Space Administration}\\
+MD, USA}
+}
+
+\maketitle
+
+\begin{abstract}
+This paper demonstrates the utility of a script to automatically apply a free and open source software failure and reliability assessment tool to generate a pdf. The script eliminates the need to work with the graphical user interface of the tool to manually assess the data and report. The reports can be used to summarize progress to technical and non-technical leadership. Simplifying the assessment and reporting may thus encourage the software and reliability practitioners to apply the models and make decisions about the process.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Software reliability, software reliability growth model, R statistical programming language, GitHub, Software Failure and Reliability Assessment Tool
+\end{IEEEkeywords}
+
+
+\section{Introduction}\label{sec:Intro}
+Software reliability growth models (SRGM)~\cite{BookHoSRE} are extremely useful in assisting the software and reliability practitioners to make practical decisions about the software by characterizing the failure data collected during testing. Some of the predictions enabled by the SRGM include remaining number of failures, failure intensity, mean time to failure, release time as well as software reliability. However practitioners are reluctant to apply these models due to lack of either the knowledge of the underlying mathematics or the time to develop expertise and implement models in their work. Therefore, several computer-aided software reliability tools~\cite{trSMERFS,inProcISSRE2013_100,lyu1992casre} were developed in the past.
+
+Previous computer-aided tools to apply software reliability methods include: Emerald~\cite{1996hudepohlemerald}, SRMP (Software Reliability Modeling Programs)~\cite{1988SRMP}, the AT\&T SRE Toolkit~\cite{1990ATT}, SoRel~\cite{1993kanounsorel}, SMERFS (Statistical Modeling and Estimation of Reliability Functions for Software)~\cite{trSMERFS}, and CASRE (Computer Aided Software Reliability Estimation)~\cite{lyu1992casre}, Robust~\cite{1995lirobust}, SREPT~\cite{2000ramanisrept}, CARATS~\cite{2011huangestimation}, SRATS~\cite{inProcISSRE2013_100}, and M-SRAT~\cite{2015shibatam}. Most of these tools are mostly spreadsheet based~\cite{inProcISSRE2013_100} or close source in nature. This inhibits the capability to integrate the existing tools into software testing work flows and update the tools with recent changes in the software reliability research. To overcome the limitation of existing tools, an open source Software Failure and Reliability Assessment Tool (SFRAT)~\cite{cFio53} is developed with a flexible architecture to accommodate individual researchers models as well as methods.
+
+In this paper, we present a script to automatically apply an open source SFRAT and generate report. This script eliminates the need to work with graphical user interface to manually prepare the a report, thus conserving time. The script can be configured to produce custom reports, for example, the user can opt to include explanation of each result in the report. The script generates a pdf to visually assess the data and to ease the reporting process. The reports can be used to summarize progress to technical and non-technical leadership.
+
+The remainder of the paper is organized as follows: Section~\ref{sec:SFRAT} provides a brief overview of the SFRAT user interface and Section~\ref{sec:Script} provides a detailed discussion of the script to generate the report automatically. Section~\ref{sec:Ex} demonstrates the use of the script through a real data, while Section~\ref{sec:Concl} provides conclusion and directions for future research.
+
+
+\section{Software Failure and Reliability Assessment Tool (SFRAT)}\label{sec:SFRAT}
+The Software Failure and Reliability Assessment Tool is a free and open source tool developed to promote quantitative assessment of software reliability and improved communication between organizations acquiring software and those conducting development and test. SFRAT is an application to estimate and predict the reliability of a software system during test and operation. Some of the questions it allows a user to answer about a software system undergoing test are:
+\begin{itemize}
+\item {Is the software ready to release (has it achieved a specified reliability goal)?}
+\item {How much more time and test effort will be required to achieve a specified goal?}
+\item {What will be the consequences to the system’s operational reliability if not enough testing resources are available?}
+\end{itemize}
+
+SFRAT is implemented in the R statistical programming language~\cite{}, an open source environment for statistical computing and graphics that can be used on computers running Windows, Mac OSX, or Linux, with the user interface implemented in Shiny~\cite{}. The code is accessible on GitHub at \textit{https://github.com/LanceFiondella/srt.core}, which can be downloaded and run using RStudio~\cite{} to use the application locally. In doing so, an organization can easily perform information assurance of the code prior to use on sensitive failure data. For complete details, the reader is referred to \textit{http://sasdlc.org/lab/projects/srt.html}.
+
+The architecture enables incorporation of existing software reliability models into a single tool, enabling more systematic comparison of models than previously possible. Presently, inter failure time, failure time, and failure count data formats are supported. Functionality includes: two trend tests for reliability growth, two failure rate~\cite{BookHoSRE}, Jelinski-Moranda and geometric, and three failure counting models, Goel-Okumoto~\cite{goel1985software}, delayed S-shaped~\cite{artTR1986_19}, and Weibull~\cite{artNHPPsurvey} models as well as two measures of goodness of fit. Inferences such as the time to achieve a target reliability or detect a specified number of additional failures have also been implemented. The free and open source nature of the tool architecture enables additional models and goodness of fit measures to be included. In this regard, the tool is intended to serve as a shared environment for collaboration among researchers and practitioners.
+
+SFRAT can be accessed either by downloading the source code from Github and run using RStudio or through the web instance. Once the application is launched, the initial SFRAT screen is shown in Figure~\ref{fig_DefaultView}.
+\begin{figure}[!h]
+\centering
+\includegraphics[width=\columnwidth]{Figures/DefaultView}
+\caption{Initial View within SFRAT}
+\label{fig_DefaultView}
+\end{figure}
+
+
+The SFRAT workflow is divided into four subtasks:
+\begin{itemize}
+\item{\textbf{Select, Analyze, and Filter Data}: Open a failure data history file and determine whether the data exhibits reliability growth that would justify model application.}
+\item{\textbf{Set Up and Apply Models}: Apply one or more software reliability models and view the results including reliability growth.}
+\item{\textbf{Query Model Results}: Query applied models to answer the following questions:
+\begin{itemize}
+\item{How many additional failures will be observed if testing is continued for an additional amount of time?}
+\item{How much additional time is required to observe a given number of additional failures?}
+\item{How much additional testing time will be needed to achieve a specified reliability goal (or has that goal already been achieved)?}
+\end{itemize}}
+\item{\textbf{Evaluate Models}: Compare the models with one another to determine which one is the most likely to characterize the data well and provide accurate predictions.}
+\end{itemize}
+
+
+\subsection{Tab 1: Select, Analyze, and Filter Data}\label{tab1}
+Figure~\ref{fig_Tab1_leftCol} shows the options in the first tab, including file selection, data visualization, and trend test analysis. User can begin to use the tool by specifying the input file as either an Excel spreadsheet (.xlsx) or a CSV (comma separated value) (.csv) format. The input file must follow the format shown in Figure~\ref{fig_Excel_sys1}, where (FN) indicates failure number, (IF) interfailure time, and (FT) failure time.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.5in]{Figures/Fig2}
+\caption{Tab one options}
+\label{fig_Tab1_leftCol}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1.8in]{Figures/sys1excel}
+\caption{Excel input file format}
+\label{fig_Excel_sys1}
+\end{figure}
+
+Clicking on the \textbf{Choose File} button enables the user to browse and upload the input data file. The progress bar message ``Upload complete'' indicates a successful file upload. By default, a plot of the cumulative failures for the uploaded data set is displayed; Figure~\ref{fig_Tab1_CDF} shows the SYS1 data set~\cite{BookHoSRE}.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.9in, height=3in]{Figures/Fig4}
+\caption{Tab one after data upload}
+\label{fig_Tab1_CDF}
+\end{figure}
+
+
+Below the progress bar, the user is able to choose a sheet from a dropdown menu listing the data sets. csv files can contain only one data set, while Excel files can contain one data set per sheet. Data sets that do not comply with the input format will not be available in the dropdown menu. During upload, the tool converts data into failure times, failure counts, and inter failure data formats regardless of the input format so that any model can be applied to any data set. $31$ data sets were taken from the Handbook of Software Reliability Engineering~\cite{BookHoSRE} and prepared in the file format. Of these, $10$ are failure time data and the remaining $21$ failure counts. This will enable more comprehensive comparison of models than ever before. Alternative data views include times between failures and failure intensity, which can be selected from the dropdown menu below the prompt to ``Choose a view of the failure data''. All plots can be drawn using either points, lines or both.
+
+%\begin{figure}[!h]
+%\centering
+%\includegraphics[width=3in]{Figures/SRT2}
+%\caption{Tab1 - Various data plots}
+%\label{fig_SRT2}
+%\end{figure}
+
+The radio buttons \textbf{Data} and \textbf{Trend test} allow the user to switch between data and trend test plots. These trend tests have been placed before model fitting to ensure that the data exhibits reliability growth and it is therefore appropriate to apply software reliability models and make predictions. The two tests implemented include the Laplace trend test~\cite{gaudoin1992optimal} and running arithmetic average.
+
+Figure~\ref{fig_Tab1_Laplace} shows the Laplace trend test of the SYS1 data set. The red line is a user specified input into the text box below the prompt to ``Specify the confidence level for the Laplace Test'' as shown in Figure~\ref{fig_Tab1_leftCol}. Here the value has been set to $0.9$ or $90\%$. Additional default levels in black include $90$, $95$, $99$, $99.9$, $99.9999$, and $99.999999$. Values below these lines indicate that the data exhibits reliability growth with the specified level of statistical significance and it is therefore suitable to apply software reliability models.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.4in]{Figures/SRT3}
+\caption{Laplace trend test}
+\label{fig_Tab1_Laplace}
+\end{figure}
+
+
+Figure~\ref{fig_SRT_RAT} shows the running arithmetic average of the SYS1 data set. Intuitively, if the time between failures increases then the running arithmetic average increases, indicating system reliability is improving. A decreasing running arithmetic average indicates reliability deterioration. Both the Laplace trend test and running arithmetic average suggest the SYS1 data set exhibits reliability growth.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.4in]{Figures/SRT_RAT}
+\caption{Running arithmetic average}
+\label{fig_SRT_RAT}
+\end{figure}
+
+
+Figure~\ref{fig:J4Trend} shows the Laplace trend test of the J4 data set which does not experience statistically significant reliability improvement. Thus, it is not appropriate to apply software reliability models to this data set until additional testing is performed that establishes confidence in reliability growth. The slider at the bottom of Figure~\ref{fig_Tab1_leftCol} ranges from $1$ to $n$, where $n$ denotes the number of data points contained in a data set. The sliders allow the user to specify a subset of the data for plotting, model fitting, and prediction. The default is to use all $n$ data points for model fitting.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.4in,height=2in]{Figures/J4_Trend_LP}
+\caption{Data set without reliability growth}
+\label{fig:J4Trend}
+\end{figure}
+
+The user can switch between the \textbf{Plot} and~\textbf{Data and Trend Test Table} in Figure~\ref{fig_Tab1_CDF}. Selecting table view displays the numerical data used to draw the plots in a tabular format similar to Figure~\ref{fig_Excel_sys1}. Selecting a radio button \textbf{.jpeg}, \textbf{.pdf}, \textbf{.png}, and \textbf{.tiff} (Figure~\ref{fig_Tab1_leftCol}) and then clicking \textbf{Save Display} saves a plot in the desired image format, while tables can be saved as csv or pdf. Tabular data can be exported to input into graphing software to include images in reports and research papers.
+
+
+%Figure~\ref{fig_SYS1_TBF} shows the table view of the first few interfailure times of the SYS1 data set.
+%\begin{figure}[!h]
+%\centering
+%\includegraphics[width=3.4in]{Figures/SRT4}
+%\caption{Table view of SYS1 failure times}
+%\label{fig_SYS1_TBF}
+%\end{figure}
+
+
+
+\subsection{Tab 2: Set up and Apply Models}\label{tab2}
+Figure~\ref{fig_Tab2} shows the options available on the second tab where model fitting is performed. The first text box allows the user to ``Specify the number of failures for which the models will make predictions''. Here the number of failures has been set to one for the sake of illustration. The second multi-select box allows the user to identify which models to fit with the data range chosen on Tab one. By default, the tool displays all available models. Clicking the \textbf{Run Selected Models} button executes the algorithms to fit selected model.
+
+\begin{figure}[!h]
+\centering%SRT5
+\includegraphics[width=3.4in]{Figures/Fig8}
+\caption{Tab two options}
+\label{fig_Tab2}
+\end{figure}
+
+Once model fitting completes, the multi-select box below ``Choose one or more sets of model results to display'' is populated with models that completed successfully. Models that fail, however, will not be available. The results of successful models can be compared against the empirical data by selecting ``Cumulative Failures'', ``Time between failures'', ``Failure intensity'', or ``Reliability growth'' from the dropdown menu below ``Choose a plot type''.
+
+Figure~\ref{fig_SYS1_Cum} shows a plot of the observed cumulative failures along with the model fits for all five models. The solid black vertical line indicates the time at which the last failure occurred. Thus, points to the right indicate predictions. This line can be hidden by deselecting the \textbf{Show end of data on plot} checkbox. The legend at the bottom identifies the line that corresponds to each model fit. Figure~\ref{fig_SYS1_Cum} suggests that the geometric and Weibull models fit the observed data closely, whereas other models over or under predict the number of failures at various stages of testing.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.4in]{Figures/SRT6}
+\caption{SYS1 cumulative failures and model fits}
+\label{fig_SYS1_Cum}
+\end{figure}
+
+
+Figures~\ref{fig_TBF},~\ref{fig_FI}, and~\ref{fig_RG} show the time between failures, failure intensity, and reliability growth data views respectively as well as with the corresponding model fits.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.4in]{Figures/TBF}
+\caption{SYS1 time between failures and model fits}
+\label{fig_TBF}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.4in]{Figures/FI}
+\caption{SYS1 failure intensity and model fits}
+\label{fig_FI}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=3.4in]{Figures/Reliability_growth}
+\caption{SYS1 reliability growth and model fits}
+\label{fig_RG}
+\end{figure}
+
+
+\subsection{Tab 3: Query Model Results}\label{tab3}
+Figure~\ref{fig_Tab3} shows the options on the third tab, which enable a variety of predictions. The multi-select box below ``Choose one or more sets of model results to display'' allows the user to specify a model with which they would like to make predictions. To determine the time required to observe the next $N$ failures, the user enters the number of failures in the text box below ``Specify the number of failures that are to be observed.''  Alternatively, the user may ``Specify the amount of additional time for which the software will run'' to determine the number of faults that would be detected in this interval. Entering numbers into these text boxes automatically generates a table such as Figure~\ref{fig_Tab3-table}, which shows the model names and expected number of failures for the next $t$ time units as well as the expected time required to detect the next $N$ failures. In this case, Figure~\ref{fig_Tab3-table} shows predictions for the SYS1 data set, including the time for one additional failure and the predicted number of failures to be observed in the next $100,000$ seconds of additional testing time.
+
+\begin{figure}[!h]
+\centering%Tab3_view
+\includegraphics[width=3.4in]{Figures/Fig13}
+\caption{Tab three options}
+\label{fig_Tab3}
+\end{figure}
+
+
+\begin{figure*}[!h]
+\centering
+\includegraphics[width=\textwidth]{Figures/Tab3-table}%Replace this figure with a high resolution one
+\caption{Failure predictions}
+\label{fig_Tab3-table}
+\end{figure*}
+
+
+
+Tab three (Figure~\ref{fig_Tab3}) also provides an option to estimate the testing time required to achieve a target reliability by entering the desired reliability and time for which the software must operate without failure in the text box below ``Specify the desired reliability'' and ``How much more test time to achieve a specified reliability?'' respectively.
+
+
+\subsection{Tab 4: Evaluate Models}\label{tab4}
+Figure~\ref{fig_SRT_tab4} shows tab four options, which provide methods to assess model goodness of fit. The multi-select box below \textbf{Choose one or more sets of model results} allows a user to specify models they would like to apply goodness of fit measures, including the Akaike information criterion (AIC)~\cite{akaike1974new} and predictive sum of squares error (PSSE)~\cite{fiondella2011software}. The text box below ``Specify the Percent Data for PSSE'' allows specification of the fraction of data to be used to compute PSSE.
+
+\begin{figure}[!h]
+\centering%SRT_tab4_1
+\includegraphics[width=3.6in]{Figures/Fig16}
+\caption{Tab four options}
+\label{fig_SRT_tab4}
+\end{figure}
+
+Figure~\ref{fig_SRT_tab4_table} shows the AIC and PSSE values for the five models applied to SYS1 when $90\%$ of data is used. The up/down arrows next to the performance measures in Figure~\ref{fig_SRT_tab4_table} sort the table based on rankings. Figure~\ref{fig_SRT_tab4_table} indicates that the Geometric and Weibull models perform best with respect to the AIC, while the Jelinski-Moranda and Goel-Okumoto models perform well with respect to PSSE.
+
+
+\begin{figure*}[!h]
+\centering
+\includegraphics[width=\textwidth]{Figures/SRT_tab4_table}%Replace this figure with a high resolution one
+\caption{AIC and PSSE of all models}
+\label{fig_SRT_tab4_table}
+\end{figure*}
+
+
+
+
+\section{Automated script to generate SFRAT report}\label{sec:Script}
+
+The script consists of $741$ lines of code including comments and blank lines between each chunk of code. The script consists of two files namely \textbf{report-specifications.R} and \textbf{SFRATReport.Rmd}. The \textbf{SFRATReport.Rmd} is a R Markdown file used to create reports in different formats and the \textbf{report-specifications.R} is an R script that allows the user to specify inputs necessary to run the SFRAT before generating a report.
+
+The user should have RStudio~\cite{} installed on their machine to be able to run the script. The user should then follow the steps described below to run the script:
+
+\begin{itemize}
+  \item {Download the contents from \href{https://github.com/vnagaraju14/SFRAT_Automated-Report-Generation} to your desired location on your computer and unzip the folder.}
+  \item {Launch R Studio and set your working directory to the location where you have saved the downloaded folder. This can be done in one of the two following ways:
+  \begin{enumerate}
+    \item {Go to the menu option \textbf{Session}$\to$\textbf{Set Working Directory}$\to$\textbf{To source file location} to set the working directory to the file location.}
+    \item {Run the following command on the console: `setwd("/FileLocation")'.}
+  \end{enumerate}
+  }
+  \item {Open and run the file `installscript.R' on R Studio to install all the required packages to run the script or run the following command: source(‘installscript.R’). This step should be followed only once and the user do not need to repeat this.}
+  \item {Open the file `report-specifications.R’ and specify the required input parameters:
+  \begin{enumerate}
+    \item {datapath, SheetName, colors}
+    \item {Tab1: confidence\_lvl}
+    \item {Tab2:
+    \begin{itemize}
+      \item {num\_failures\_future\_prediction}
+      \item {models\_to\_apply}
+      \item {mission\_time}
+    \end{itemize}
+    }
+    \item {Tab3:
+    \begin{itemize}
+      \item {num\_failures\_to\_predict}
+      \item {additional\_time\_software\_will\_run}
+      \item {desired\_reliability}
+      \item {reliability\_interval\_length}
+    \end{itemize}
+    }
+    \item {Tab4: percent\_data\_for\_PSSE}
+  \end{enumerate}
+  }
+  \item {In the console, run the following command: source(‘report-specifications.R’) or you can click on ‘source’ option on the topright corner.\\
+  \textbf{screenshot}}
+  \item {Select ‘1’ to display verbose report, `0' otherwise.}
+  \item {Select ‘1’ to select data subsetting option, `0' otherwise. If `1' is selected, then specify the percentage of data between $0$ to $1$.}
+  \item {Generated reports will be stored in the Report folder in the same location as the script.}
+\end{itemize}
+
+
+
+\textbf{Discussion of parameters with screenshots}
+
+
+\section{Illustrations}\label{sec:Ex}
+example of application sequence that enables comparison of which model predicts best throughout the data
+
+collection process and the assessments that might have been made if this were an ongoing activity. We can do this in the
+
+context of sys1 and then adapt to NASA data.
+
+
+\section{Conclusion and Future Work}\label{sec:Concl}
+
+
+\section*{Acknowledgment}\label{sec:Ack}
+
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibIEEE}
+
+\end{document}
