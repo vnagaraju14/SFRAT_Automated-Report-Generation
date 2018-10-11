@@ -49,7 +49,7 @@ TODO:
 
 Acknowledgement
 --------------
-This research was supported by Natioanl Aeronautics and Space Administration (NASA) SARP under Grant Number (#).
+This research was supported by the Natioanl Aeronautics and Space Administration (NASA) SARP under Grant Number (#).
 
 
 
