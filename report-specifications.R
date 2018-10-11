@@ -10,28 +10,28 @@ library(ggplot2)
 library(rootSolve)
 
 datapath <- paste0(getwd(), '/SFRAT/model_testing/model_data.xlsx')   #path to the dataset
-sheetNumber <- 1
+sheetNumber <- 1          #Select the sheet number in the excel file if there are multiple sheets
 
-datasettemp <- read_excel(datapath,sheet = sheetNumber)  #Specify the sheet with the data
-SheetName<-excel_sheets(path=datapath)[sheetNumber] #Specify the sheet selected in the above line
-colors <- c("navy","red","green","firebrick4","magenta")
+datasettemp <- read_excel(datapath,sheet = sheetNumber)  
+SheetName<-excel_sheets(path=datapath)[sheetNumber] 
+colors <- c("navy","red","green","firebrick4","magenta") # Specify colors for your model output
 
 # TAB 1
-confidence_lvl <- .9 #float
+confidence_lvl <- .9 #Should be between 0 to 1
 
 # TAB 2
-num_failures_future_prediction <- 2
-models_to_apply <- c('DSS', 'GM', 'Wei','GO','JM') #vector
-mission_time <- 600
+num_failures_future_prediction <- 2 #Number of failures to predict beyond end of testing
+models_to_apply <- c('DSS', 'GM', 'Wei','GO','JM') #Specify the models you would like to apply
+mission_time <- 600 #Specify the mission time to compute reliability growth
 
 # TAB 3
-num_failures_to_predict <- 2 #integer
-additional_time_software_will_run <- 4116 #float
-desired_reliability <- .9 #float
-reliability_interval_length<- 600 #float
+num_failures_to_predict <- 2 #Number of failures to predict beyond end of testing (Same as Tab 2 input, however, you can select different number than Tab 2)
+additional_time_software_will_run <- 4116 #Operation/mission time beyond end of testing to compute number of failures
+desired_reliability <- .9 #Specify desired reliability between 0 to 1, to estimate the testing time to achieve it within the specified mission time.
+reliability_interval_length<- 600 #Mission time during which you desire to achieve the target reliability
 
 # TAB 4
-percent_data_for_PSSE <- .9
+percent_data_for_PSSE <- .9 #Specify the percent of data between 0 to 1 that you would like to use for model fitting. The remaining data will be used to assess model prediction capability.
 
 #Verbose report
 dataset <- datasettemp[1:floor(dim(datasettemp)[1]),]
