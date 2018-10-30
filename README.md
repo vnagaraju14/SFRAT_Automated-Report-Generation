@@ -3,7 +3,8 @@ Script to Generate Report for the Software Failure and Reliability Assessment To
 
 An R script to automatically apply a free and open source software failure and reliability assessment tool to generate a pdf. Any resources related to the (SFRAT) is available at https://sasdlc.org/lab/assets/projects/srt.html.
 
-Refer to https://github.com/LanceFiondella/SFRAT-Automated-Report for latest updates.
+Lance Fiondella, Assistant Professor, University of Massachusetts Dartmouth
+
 
 Installation
 -------
@@ -37,7 +38,8 @@ source(‘report-specifications.R’)
 Related Resources:
 -------
 
-- [ ] In progress.
+- [ ] In progress. Email Dr. Lance Fiondella for any questions.
+
 TODO:
 -------
 
@@ -47,7 +49,7 @@ TODO:
 
 Acknowledgement
 --------------
-This research was supported by Natioanl Aeronautics and Space Administration (NASA) SARP under Grant Number (#).
+This research was supported by the Natioanl Aeronautics and Space Administration (NASA) SARP under Grant Number (#).
 
 
 

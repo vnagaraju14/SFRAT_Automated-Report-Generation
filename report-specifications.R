@@ -1,3 +1,4 @@
+
 # edit below for script parameters #
 	
 #subset data into parts? 1 for yes, 0 for no
@@ -58,7 +59,6 @@ datapath <- paste0(getwd(), filePath)
 datasettemp <- read_excel(datapath,sheet = sheetNumber)  #Specify the sheet with the data
 SheetName<-excel_sheets(path=datapath)[sheetNumber] #Specify the sheet selected in the above line
 colors <- c("navy","red","green","firebrick4","magenta")
-
 
 dataset <- datasettemp[1:floor(dim(datasettemp)[1]),]
 x <- verbose_report
