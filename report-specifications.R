@@ -2,15 +2,16 @@
 # edit below for script parameters #
 	
 #subset data into parts? 1 for yes, 0 for no
-subset_data <- 0
+#subset_data <- 0 #Uncomment lines 70-82 if this option is enabled
 
 #1 for verbose report, 2 for non-verbose
-verbose_report <- 2									
+verbose_report <- 1								
 
-#select which sheet to pick, in this case gives SYS1
-sheetNumber <- 1
 #designate location of data file
 filePath <- '/SFRAT/model_testing/model_data.xlsx'
+#select which sheet to pick, in this case gives SYS1
+sheetNumber <- 1
+colors <- c("navy","red","green","firebrick4","magenta")
 
 #Tab 1 Parameters:
 	#laplace test confidence level
@@ -52,28 +53,30 @@ library("formatR")
 library("shiny")
 library("DT")
 library("gdata")
+library("Rcpp")
 library("ggplot2")
 library("rootSolve")
+library("colorspace")
 
 datapath <- paste0(getwd(), filePath)
 datasettemp <- read_excel(datapath,sheet = sheetNumber)  #Specify the sheet with the data
 SheetName<-excel_sheets(path=datapath)[sheetNumber] #Specify the sheet selected in the above line
-colors <- c("navy","red","green","firebrick4","magenta")
+
 
 dataset <- datasettemp[1:floor(dim(datasettemp)[1]),]
 x <- verbose_report
 rmarkdown::render(paste0(getwd(),'/SFRATReport.Rmd'),output_file =  paste("SFRAT report_", SheetName,'_', Sys.Date(), ".pdf", sep=''),output_dir = './Reports') 
 
-if (subset_data==1) {
-  ds <- readline(prompt="How many percent of data should be used in each subset? (Input should be between 0 to 1)___")
-  ds <- as.double(ds) 
-  dsi <- ds
-  while(dsi<=1){
-    dataset <- datasettemp[1:floor(dsi*dim(datasettemp)[1]),]
-    rmarkdown::render(paste0(getwd(),'/SFRATReport.Rmd'),output_file =  paste("SFRAT report_", SheetName,'_',dsi,'_', Sys.Date(), ".pdf", sep=''), output_dir = './Reports') 
-    dsi=dsi+ds;
-  }
-  } else {
-  dataset <- read_excel(datapath,sheet = 1)
-  rmarkdown::render(paste0(getwd(),'/SFRATReport.Rmd'), output_file =  paste("SFRAT report_", SheetName,'_', Sys.Date(), ".pdf", sep=''),output_dir = './Reports') 
-}
+#if (subset_data==1) {
+#  ds <- readline(prompt="How many percent of data should be used in each subset? (Input should be between 0 to 1)___")
+#  ds <- as.double(ds) 
+#  dsi <- ds
+#  while(dsi<=1){
+#    dataset <- datasettemp[1:floor(dsi*dim(datasettemp)[1]),]
+#    rmarkdown::render(paste0(getwd(),'/SFRATReport.Rmd'),output_file =  paste("SFRAT report_", SheetName,'_',dsi,'_', Sys.Date(), ".pdf", sep=''), output_dir = './Reports') 
+#    dsi=dsi+ds;
+#  }
+#  } else {
+#  dataset <- read_excel(datapath,sheet = 1)
+#  rmarkdown::render(paste0(getwd(),'/SFRATReport.Rmd'), output_file =  paste("SFRAT report_", SheetName,'_', Sys.Date(), ".pdf", sep=''),output_dir = './Reports') 
+#}

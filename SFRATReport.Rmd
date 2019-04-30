@@ -3,6 +3,7 @@ title: 'Software Failure and Reliability Assessment Tool: Report'
 author: "Author Name"
 date: '`r format(Sys.time(), "%Y-%m-%d_%H:%M")`'
 output:
+  #html_document: default
   pdf_document: default
 ---
   
@@ -54,9 +55,9 @@ tryCatch({                                  #Data conversion depending on the ty
 d <- data.frame("FN"=FN,"IF"=IF,"FT"=FT)
 ```
 
-#Tab 1: Select, Apply, and Analyze Data
+# Tab 1: Select, Apply, and Analyze Data
 
-##Sample of the updated data ('`r SheetName`') in different formats:
+## Sample of the updated data ('`r SheetName`') in different formats:
 `r if (x==1){paste0("The table below shows the first ten points of the input data ",SheetName,". 'FC', 'CFC', 'FT', 'IF', and 'FN' indicates failure counts, cumulative failure counts, failure times, interfailure times, and number of failures respectively.")}`
 
 ```{r, echo=FALSE}
@@ -68,7 +69,7 @@ if("T" %in% cnames && "FC" %in% cnames && "CFC" %in% cnames) {
 ```
 
 \newpage
-##Cumulative failures
+## Cumulative failures
 `r if (x==1){paste0("The following figure shows the ",SheetName," data  as the cumulative number of failures (FN) detected as a function of cumulative test time (FT). An increasing trend indicates periods where more faults were detected. Ideally, the cumulative number of failures should level off to a horizontal line, indicating that no new faults have been detected.")}`
 
 ```{r, echo=FALSE}
@@ -80,7 +81,7 @@ plot(
 ```
 
 \newpage
-##Times between failures/Interfailure times
+## Times between failures/Interfailure times
 
 `r if (x==1) {paste0("The following figure shows the ",SheetName," times between failures (IF) as a function of cumulative test time (FT). An increasing trend indicates periods where fewer faults were detected. Ideally, the time between failures should increase, indicating that no new faults have been detected.")}`
 
@@ -89,7 +90,7 @@ plot(FT, IF, type="s", xlab="Cumulative test time", ylab="Times between failures
 ```
 
 \newpage
-##Failure intensity
+## Failure intensity
 `r if (x==1){paste0("The following figure shows the ",SheetName," data as the number of failures detected per unit time as a function of cumulative test time (FT). A decreasing trend indicates periods where fewer faults were detected. Ideally, the failure intensity should decrease, indicating that no new faults have been detected.\n\n
 A decrease in failure intensity indicates increase in reliability of the software subjected to testing. Ideally, the failure intensity should go to zero.")}`
 
@@ -99,7 +100,7 @@ plot(FT, 1/IF, type="s",xlab="Cumulative test time",ylab="Number of failures per
 ```
 
 \newpage
-##Laplace Trend Test
+## Laplace Trend Test
 `r if (x==1){paste0("The following figure shows the Laplace test statistic for reliability growth as a function of cumulative test time (FT). A decreasing trend indicates reliability growth, while an increasing trend indicates reliabilty deterioration. The Laplace test statistic on the y-axis corresponds to the critical values of a normal distribution. This means that if the trend falls below a specific level, then we cannot reject the null hypothesis that the failure data suggests reliability growth at a specified level of confidence. The six black dot-dash style lines correspond to the 90%, 95%, 99%, 99.9%, 99.9999%, and 99.999999% respectively. The red line is user-specified and has been set to ",percent_data_for_PSSE*100,"%. The level of confidence is a subjective choice made by the analyst. Reliability growth is desired because software reliability growth models assume curves that exhibit increasing time between failures. If reliability growth is not present than the model fitting step may fail or produce predictions that are inaccurate. Therefore, the Laplace test statistic provides an objective quantitative measure for the analyst to decide if predictions may or may not be accurate.")}`
 
 ```{r, echo=FALSE}
@@ -154,7 +155,7 @@ localTrendPlot
 ```
 
 \newpage
-##Running arithmetic average
+## Running arithmetic average
 
 `r if (x==1){paste0("The running arithmetic average plots the average of the first k times between failure. An increasing trends indicates reliability growth, while a decreasing trend indicates reliability deterioration. This is intuitive because if the time between failures is increasing, then later failures will increase the average.")}`
 
@@ -177,7 +178,7 @@ plot(running_average_test(IF), type="s",xlab="Failure number", ylab="Running ave
 ```
 
 \newpage
-#Tab2: Set Up and Apply Models
+# Tab2: Set Up and Apply Models
 
 ```{r, echo=FALSE}
 source('./SFRAT/models/DSS/DSS_BM_FT.R')
@@ -308,7 +309,7 @@ hft <- data.frame(ftList)
 ntrees <- length(models)
 ```
 
-##Cumulative failures
+## Cumulative failures
 `r if (x==1){paste0("The following figure shows the fit of",if('DSS' %in% models){paste(" delayed s-shaped, ")}, if('GM' %in% models){paste(" geometric, ")},if('Wei' %in% models){paste(" Weibull, ")},if('GO' %in% models){paste(" Goel-Okumoto, ")},if('JM' %in% models){paste(" Jelinski-Moranda ")}, "models to the cumulative number of failures detected in the ",SheetName," data.")}`
 
 ```{r, echo=FALSE}
@@ -324,7 +325,7 @@ legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
 \newpage
-##Times between failures
+## Times between failures
 
 `r if (x==1){paste0("The following figure shows the fit of",if('DSS' %in% models){paste(" delayed s-shaped, ")}, if('GM' %in% models){paste(" geometric, ")},if('Wei' %in% models){paste(" Weibull, ")},if('GO' %in% models){paste(" Goel-Okumoto, ")},if('JM' %in% models){paste(" Jelinski-Moranda ")}, "models to the times between failures detected in the ",SheetName," data.")}`
 
@@ -342,7 +343,7 @@ legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
 \newpage
-##Failure intensity
+## Failure intensity
 
 `r if (x==1){paste0("The following figure shows the fit of",if('DSS' %in% models){paste(" delayed s-shaped, ")}, if('GM' %in% models){paste(" geometric, ")},if('Wei' %in% models){paste(" Weibull, ")},if('GO' %in% models){paste(" Goel-Okumoto, ")},if('JM' %in% models){paste(" Jelinski-Moranda ")}, "models to the failure intensity of the ",SheetName," data.")}`
 
@@ -369,7 +370,7 @@ legend("topright", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
 \newpage
-##Reliability growth
+## Reliability growth
 
 
 `r if (x==1){paste0("The following figure shows the reliability growth curve of the  fit of",if('DSS' %in% models){paste(" delayed s-shaped, ")}, if('GM' %in% models){paste(" geometric, ")},if('Wei' %in% models){paste(" Weibull, ")},if('GO' %in% models){paste(" Goel-Okumoto, ")},if('JM' %in% models){paste(" Jelinski-Moranda ")}, "models to the ",SheetName," data. The data itself does not display. This plot indicates a models prediction that the software will be reliable (exhibit zero failures) for a duration of ",mission_time," time units as a function of cumulative test time (FT). Selecting a model upon which to base a reliability assessment is a subjective choice made by the analyst. Statistical measures of goodness of fit, reported on page 12 of this report can be used to decide this decision making process. If the Laplace test statistic does not exhibit reliability growth, than a conservative approach is to document this as the reason why no reliability estimate is provided at the time of preparing a report.")}`
@@ -385,7 +386,7 @@ legend("topleft", legend=models, lty=c(1,1), cex=0.8, col=colors)
 ```
 
 \newpage
-#Tab3: Query Model Results
+# Tab3: Query Model Results
 `r if (x==1){paste0("The following table shows inferences enabled by the models, including the time to achieve a reliability of ",desired_reliability*100,"% (probability of zero failures for ",reliability_interval_length," time units), expected number of failures in the next ",additional_time_software_will_run," time units, and expected time to observe an additional ",num_failures_to_predict," failures computed for the fit of",if('DSS' %in% models){paste(" delayed s-shaped (DSS), ")}, if('GM' %in% models){paste(" geometric (GM), ")},if('Wei' %in% models){paste(" Weibull (Wei), ")},if('GO' %in% models){paste(" Goel-Okumoto (GO), ")},if('JM' %in% models){paste(" Jelinski-Moranda (JM) ")}, "models to the models.")}`
 
 ```{r,echo=FALSE}

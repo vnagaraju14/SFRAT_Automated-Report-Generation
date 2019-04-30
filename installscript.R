@@ -19,15 +19,20 @@ if (version$major < 3 || (version$major == 3 && version$minor < 2.2)){ #checks i
 
 
 #checks for each dependancy and loads or installs then loads
-install.packages("htmltools")
-if(!require(shiny)) {install.packages("shiny", repos="http://cran.rstudio.com/");library(shiny)} #shiny is the main interface package
-if(!require(DT)) {install.packages("DT", repos="http://cran.rstudio.com/");library(DT)} #DT
-if(!require(knitr)) {install.packages("knitr", repos="http://cran.rstudio.com/");library(knitr)} #DT
-if(!require(gdata)) {install.packages("gdata", repos="http://cran.rstudio.com/");library(gdata)} #gdata is used for manipulating the data out of an excel sheet
-if(!require(ggplot2)) {install.packages("ggplot2", repos="http://cran.rstudio.com/");library(ggplot2)} #ggplot2 is used for crerating various plots
-if(!require(rootSolve)) {install.packages("rootSolve", repos="http://cran.rstudio.com/");library(rootSolve)} #rootSolve is used for finding a root of an equation
-if(!require(readxl)) {install.packages("readxl", repos="http://cran.rstudio.com/");library(readxl)} #
-if(!require(markdown)) {install.packages("readxl", repos="http://cran.rstudio.com/");library(markdown)} #
-if(!require(rmarkdown)) {install.packages("readxl", repos="http://cran.rstudio.com/");library(rmarkdown)} #
-if(!require(formatR)) {install.packages("readxl", repos="http://cran.rstudio.com/");library(formatR)} #
+
+if(!require(shiny)) {install.packages("shiny", repos="http://cran.rstudio.com/");library(shiny)}  #shiny is the main interface package
+if(!require(DT)) {install.packages("DT", repos="http://cran.rstudio.com/");  library(DT)} #DT
+if(!require(knitr)) {install.packages("knitr", repos="http://cran.rstudio.com/");library(knitr)} #knitr
+if(!require(installr)) {install.packages("installr", repos="http://cran.rstudio.com/");library(installr)} 
+if(!require(markdown)) {install.packages("markdown", repos="http://cran.rstudio.com/");library(markdown)} 
+if(!require(rmarkdown)) {install.packages("rmarkdown", repos="http://cran.rstudio.com/");library(rmarkdown)} 
+if(!require(readxl)) {install.packages("readxl", repos="http://cran.rstudio.com/");library(readxl)} 
+if(!require(formatR)) {install.packages("formatR", repos="http://cran.rstudio.com/");library(formatR)} 
+if(!require(gdata)) {install.packages("gdata", repos="http://cran.rstudio.com/");library(gdata)} 
+if(!require(Rcpp)) {install.packages("Rcpp", dependencies = TRUE, repos="http://cran.rstudio.com/");library(Rcpp)} 
+if(!require(ggplot2)) {install.packages("ggplot2", dependencies = TRUE, repos="http://cran.rstudio.com/");library(ggplot2)} 
+if(!require(rootSolve)) {install.packages("rootSolve", repos="http://cran.rstudio.com/");library(rootSolve)} 
+if(!require(colorspace)) {install.packages("colorspace", repos="http://cran.rstudio.com/");library(colorspace)} 
+if(!require(data.table)) {install.packages("data.table", dependencies = TRUE, repos="http://cran.rstudio.com/");library(data.table)} 
+if(!require(htmltools)) {install.packages("htmltools", repos="http://cran.rstudio.com/");library(htmltools)}
 
