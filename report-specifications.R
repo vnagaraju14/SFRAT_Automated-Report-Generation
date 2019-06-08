@@ -11,7 +11,7 @@ verbose_report <- 1
 filePath <- '/SFRAT/model_testing/model_data.xlsx'
 #select which sheet to pick, in this case gives SYS1
 sheetNumber <- 1
-colors <- c("navy","red","green","firebrick4","magenta")
+colors <- c("navy","red","green","firebrick4","magenta","blue")
 
 #Tab 1 Parameters:
 	#laplace test confidence level
@@ -22,7 +22,7 @@ colors <- c("navy","red","green","firebrick4","magenta")
 	num_failures_future_prediction <- 2	
 
 	#pick models to include, by default is all
-	models_to_apply <- c('DSS', 'GM', 'Wei','GO','JM')
+	models_to_apply <- c('DSS', 'GM', 'Wei','GO','JM','ISS')
 	#mission time to compute reliability growth
 	mission_time <- 600
 
